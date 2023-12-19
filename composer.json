@@ -1,0 +1,20 @@
+{
+    "name": "darkside/dsgprdcookie",
+    "license": "AFL-3.0",
+    "authors": [{
+            "name": "Patryk Tchórzewski",
+            "email": "patryk@dark-side.pro"
+        },
+        {
+            "name": "Dark-Side",
+            "homepage": "https://dark-side.com"
+        }
+    ],
+    "autoload": {
+        "classmap": ["src"],
+        "config": {
+            "prepend-autoloader": false
+        },
+        "type": "prestashop-module"
+    }
+}
