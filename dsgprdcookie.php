@@ -9,10 +9,8 @@
  */
 declare(strict_types=1);
 
-use DarkSide\DsOmnibus\Database\Installer;
-use DarkSide\DsOmnibus\Exception\MissingServiceException;
-use Doctrine\DBAL\Connection;
-use Symfony\Component\Ldap\Adapter\ConnectionInterface;
+use DarkSide\DsGPRDCookie\Database\Installer;
+use DarkSide\DsGPRDCookie\Exception\MissingServiceException;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -41,8 +39,18 @@ class DsGPRDCookie extends Module
     {
         $this->installTables();
 
-        return parent::install() && $this->registerHook('actionProductSave') && $this->registerHook('displayOmnibus');
+        return parent::install() && $this->registerHook('displayFooter');
     }
+
+    public $tabs = [
+        [
+            'name' => 'DS: GPRD Cookie', // Fallback when the translation is unavailable
+            'class_name' => 'AdminGamification',
+            'parent_class_name' => 'DEFAULT',
+            'wording' => 'DS: GPRD Cookie', // Translation key
+            'wording_domain' => 'Modules.DsGPRDCookie.Admin', // Translation domain
+        ],
+    ];
 
     public function uninstall()
     {
@@ -75,5 +83,10 @@ class DsGPRDCookie extends Module
         $installer = new Installer($translator);
         
         return $installer;
+    }
+
+    public function hookDisplayFooter()
+    {
+
     }
 }
