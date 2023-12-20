@@ -15,7 +15,7 @@ use Context;
 use DarkSide\DsGPRDCookie\Repository\CookieRepository;
 use PrestaShop\PrestaShop\Core\Form\IdentifiableObject\DataProvider\FormDataProviderInterface;
 
-class QuoteFormDataProvider implements FormDataProviderInterface
+class CookieFormDataProvider implements FormDataProviderInterface
 {
     /**
      * @var CookieRepository
