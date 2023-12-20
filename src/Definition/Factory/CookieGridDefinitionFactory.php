@@ -20,21 +20,22 @@
 
 declare(strict_types=1);
 
-namespace Module\DemoGrid\Grid\Definition\Factory;
+namespace DarkSide\DsGPRDCookie\Grid\Definition\Factory;
 
 use PrestaShop\PrestaShop\Core\Grid\Column\ColumnCollection;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\ActionColumn;
-use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
+use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Definition\Factory\AbstractGridDefinitionFactory;
 use PrestaShop\PrestaShop\Core\Grid\Filter\Filter;
 use PrestaShop\PrestaShop\Core\Grid\Filter\FilterCollection;
 use PrestaShopBundle\Form\Admin\Type\NumberMinMaxFilterType;
 use PrestaShopBundle\Form\Admin\Type\SearchAndResetType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
+class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
 {
-    const GRID_ID = 'product';
+    const GRID_ID = 'ds_cookie';
 
     /**
      * {@inheritdoc}
@@ -49,7 +50,7 @@ class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
      */
     protected function getName()
     {
-        return $this->trans('Products', [], 'Modules.Demogrid.Admin');
+        return $this->trans('Cookies', [], 'Modules.DsGPRDCookie.Admin');
     }
 
     /**
@@ -59,37 +60,37 @@ class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
     {
         return (new ColumnCollection())
             ->add(
-                (new DataColumn('id_product'))
+                (new DataColumn('id'))
                     ->setOptions([
-                        'field' => 'id_product',
+                        'field' => 'id',
                     ])
             )
             ->add(
-                (new DataColumn('name'))
-                    ->setName($this->trans('Name', [], 'Modules.Demogrid.Admin'))
+                (new DataColumn('cookie_service'))
+                    ->setName($this->trans('Service name', [], 'Modules.DsGPRDCookie.Admin'))
                     ->setOptions([
-                        'field' => 'name',
+                        'field' => 'cookie_service',
                     ])
             )
             ->add(
-                (new DataColumn('price_tax_excluded'))
-                    ->setName($this->trans('Price', [], 'Modules.Demogrid.Admin'))
+                (new DataColumn('cookie_category'))
+                    ->setName($this->trans('Category', [], 'Modules.DsGPRDCookie.Admin'))
                     ->setOptions([
-                        'field' => 'price_tax_excluded',
+                        'field' => 'cookie_category',
                     ])
             )
             ->add(
-                (new DataColumn('reference'))
-                    ->setName($this->trans('Reference', [], 'Modules.Demogrid.Admin'))
+                (new DataColumn('cookie_name'))
+                    ->setName($this->trans('Cookie part name', [], 'Modules.DsGPRDCookie.Admin'))
                     ->setOptions([
-                        'field' => 'reference',
+                        'field' => 'cookie_name',
                     ])
             )
             ->add(
-                (new DataColumn('active'))
-                    ->setName($this->trans('Active', [], 'Modules.Demogrid.Admin'))
+                (new DataColumn('enabled'))
+                    ->setName($this->trans('Active', [], 'Modules.DsGPRDCookie.Admin'))
                     ->setOptions([
-                        'field' => 'active',
+                        'field' => 'enabled',
                     ])
             )
             ->add(
@@ -103,39 +104,31 @@ class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
      */
     protected function getFilters()
     {
+        
         return (new FilterCollection())
             ->add(
-                (new Filter('id_product', TextType::class))
+                (new Filter('id', TextType::class))
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
                             'placeholder' => $this->trans('ID', [], 'Admin.Global'),
                         ],
                     ])
-                    ->setAssociatedColumn('id_product')
+                    ->setAssociatedColumn('id')
             )
             ->add(
-                (new Filter('name', TextType::class))
+                (new Filter('cookie_service', TextType::class))
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
-                            'placeholder' => $this->trans('Name', [], 'Admin.Global'),
+                            'placeholder' => $this->trans('Service name', [], 'Admin.Global'),
                         ],
                     ])
-                    ->setAssociatedColumn('name')
+                    ->setAssociatedColumn('cookie_service')
             )
             ->add(
-                (new Filter('price_tax_excluded', NumberMinMaxFilterType::class, [
-                    'min_field_options' => [
-                        'attr' => [
-                            'placeholder' => $this->trans('Min', [], 'Admin.Global'),
-                        ],
-                    ],
-                    'max_field_options' => [
-                        'attr' => [
-                            'placeholder' => $this->trans('Max', [], 'Admin.Global'),
-                        ],
-                    ],
+                (new Filter('cookie_category', ChoiceType::class, [
+                    'choices' => []
                 ]))
                     ->setTypeOptions([
                         'required' => false,
