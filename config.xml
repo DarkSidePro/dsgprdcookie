@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-    <name>demodoctrine</name>
-    <displayName><![CDATA[Demo doctrine]]></displayName>
+    <name>dsgprdcookie</name>
+    <displayName><![CDATA[DS: GPRD Cookie]]></displayName>
     <version><![CDATA[1.0.0]]></version>
     <description><![CDATA[Help your customer to prevent them privacy]]></description>
-    <author><![CDATA[PrestaShop]]></author>
+    <author><![CDATA[Dark-Side.pro]]></author>
     <tab><![CDATA[]]></tab>
     <is_configurable>1</is_configurable>
     <need_instance>1</need_instance>
