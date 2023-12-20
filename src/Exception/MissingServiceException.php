@@ -1,6 +1,6 @@
 <?php
 
-    namespace DarkSide\DsOmnibus\Exception;
+    namespace DarkSide\DsGPRDCookie\Exception;
 
     use PrestaShop\PrestaShop\Core\Exception\PrestaShopException;
 
