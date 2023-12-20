@@ -20,14 +20,14 @@
 
 declare(strict_types=1);
 
-namespace  DarkSide\Module\GPRDCookie\Grid\Filters;
+namespace  DarkSide\DsGPRDCookie\Grid\Filters;
 
-use Module\DemoGrid\Grid\Definition\Factory\ProductGridDefinitionFactory;
+use Grid\Definition\Factory\CookieGridDefinitionFactory;
 use PrestaShop\PrestaShop\Core\Search\Filters;
 
-class ScriptFilters extends Filters
+class CookieFilters extends Filters
 {
-    protected $filterId = ProductGridDefinitionFactory::GRID_ID;
+    protected $filterId = CookieGridDefinitionFactory::GRID_ID;
 
     /**
      * {@inheritdoc}
