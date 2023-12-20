@@ -9,22 +9,14 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\Module\GPRDCookie\Controller\Admin;
+namespace DarkSide\DsGPRDCookie\Controller\Admin;
 
-use Doctrine\DBAL\Driver\Connection;
-use Doctrine\DBAL\Exception\TableExistsException;
-use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
-use Module\DemoDoctrine\Entity\Quote;
-use Module\DemoDoctrine\Entity\QuoteLang;
-use Module\DemoDoctrine\Grid\Definition\Factory\QuoteGridDefinitionFactory;
-use Module\DemoDoctrine\Grid\Filters\QuoteFilters;
+use DarkSide\DsGPRDCookie\Grid\Filters\CookieFilters;
+use Grid\Definition\Factory\CookieGridDefinitionFactory;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
-use PrestaShopBundle\Entity\Lang;
-use PrestaShopBundle\Entity\Repository\LangRepository;
 use PrestaShopBundle\Service\Grid\ResponseBuilder;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,18 +30,18 @@ class CookieController extends FrameworkBundleAdminController
      *
      * @return Response
      */
-    public function indexAction(ScriptFilters $filters)
+    public function indexAction(CookieFilters $filters)
     {
-        $quoteGridFactory = $this->get('prestashop.module.demodoctrine.grid.factory.quotes');
-        $quoteGrid = $quoteGridFactory->getGrid($filters);
+        $cookieGridFactory = $this->get('darkside.module.dsgprd.grid.factory.cookies');
+        $dsCookieGrid = $cookieGridFactory->getGrid($filters);
 
         return $this->render(
-            '@Modules/demodoctrine/views/templates/admin/index.html.twig',
+            '@Modules/dsgprdcookie/views/templates/admin/index.html.twig',
             [
                 'enableSidebar' => true,
-                'layoutTitle' => $this->trans('Quotes', 'Modules.DsGPRDCookie.Admin'),
+                'layoutTitle' => $this->trans('Cookies', 'Modules.DsGPRDCookie.Admin'),
                 'layoutHeaderToolbarBtn' => $this->getToolbarButtons(),
-                'quoteGrid' => $this->presentGrid($quoteGrid),
+                'ds_cookie' => $this->presentGrid($dsCookieGrid),
             ]
         );
     }
@@ -67,37 +59,10 @@ class CookieController extends FrameworkBundleAdminController
         $responseBuilder = $this->get('prestashop.bundle.grid.response_builder');
 
         return $responseBuilder->buildSearchResponse(
-            $this->get('prestashop.module.demodoctrine.grid.definition.factory.quotes'),
+            $this->get('darkside.module.dsgprd.grid.definition.factory.cookies'),
             $request,
-            QuoteGridDefinitionFactory::GRID_ID,
-            'ps_demodoctrine_quote_index'
-        );
-    }
-
-    /**
-     * List quotes
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function generateAction(Request $request)
-    {
-        if ($request->isMethod('POST')) {
-            $generator = $this->get('prestashop.module.demodoctrine.quotes.generator');
-            $generator->generateQuotes();
-            $this->addFlash('success', $this->trans('Quotes were successfully generated.', 'Modules.Demodoctrine.Admin'));
-
-            return $this->redirectToRoute('ps_demodoctrine_quote_index');
-        }
-
-        return $this->render(
-            '@Modules/demodoctrine/views/templates/admin/generate.html.twig',
-            [
-                'enableSidebar' => true,
-                'layoutTitle' => $this->trans('Quotes', 'Modules.Demodoctrine.Admin'),
-                'layoutHeaderToolbarBtn' => $this->getToolbarButtons(),
-            ]
+            CookieGridDefinitionFactory::GRID_ID,
+            'ds_gprdcookie_cookie_index'
         );
     }
 
@@ -110,11 +75,11 @@ class CookieController extends FrameworkBundleAdminController
      */
     public function createAction(Request $request)
     {
-        $quoteFormBuilder = $this->get('prestashop.module.demodoctrine.form.identifiable_object.builder.quote_form_builder');
+        $quoteFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
         $quoteForm = $quoteFormBuilder->getForm();
         $quoteForm->handleRequest($request);
 
-        $quoteFormHandler = $this->get('prestashop.module.demodoctrine.form.identifiable_object.handler.quote_form_handler');
+        $quoteFormHandler = $this->get('darkside.module.dsgprd.form.identifiable_object.handler.cookie_form_handler');
         $result = $quoteFormHandler->handle($quoteForm);
 
         if (null !== $result->getIdentifiableObjectId()) {
@@ -123,10 +88,10 @@ class CookieController extends FrameworkBundleAdminController
                 $this->trans('Successful creation.', 'Admin.Notifications.Success')
             );
 
-            return $this->redirectToRoute('ps_demodoctrine_quote_index');
+            return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
 
-        return $this->render('@Modules/demodoctrine/views/templates/admin/create.html.twig', [
+        return $this->render('@Modules/dsgprdcookie/views/templates/admin/create.html.twig', [
             'quoteForm' => $quoteForm->createView(),
         ]);
     }
@@ -141,20 +106,20 @@ class CookieController extends FrameworkBundleAdminController
      */
     public function editAction(Request $request, $quoteId)
     {
-        $quoteFormBuilder = $this->get('prestashop.module.demodoctrine.form.identifiable_object.builder.quote_form_builder');
+        $quoteFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
         $quoteForm = $quoteFormBuilder->getFormFor((int) $quoteId);
         $quoteForm->handleRequest($request);
 
-        $quoteFormHandler = $this->get('prestashop.module.demodoctrine.form.identifiable_object.handler.quote_form_handler');
+        $quoteFormHandler = $this->get('darkside.module.dsgprd.form.identifiable_object.handler.cookie_form_handler');
         $result = $quoteFormHandler->handleFor((int) $quoteId, $quoteForm);
 
         if ($result->isSubmitted() && $result->isValid()) {
             $this->addFlash('success', $this->trans('Successful update.', 'Admin.Notifications.Success'));
 
-            return $this->redirectToRoute('ps_demodoctrine_quote_index');
+            return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
 
-        return $this->render('@Modules/demodoctrine/views/templates/admin/edit.html.twig', [
+        return $this->render('@Modules/dsgprdcookie/views/templates/admin/edit.html.twig', [
             'quoteForm' => $quoteForm->createView(),
         ]);
     }
@@ -168,7 +133,8 @@ class CookieController extends FrameworkBundleAdminController
      */
     public function deleteAction($quoteId)
     {
-        $repository = $this->get('prestashop.module.demodoctrine.repository.quote_repository');
+        $repository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
+        
         try {
             $quote = $repository->findOneById($quoteId);
         } catch (EntityNotFoundException $e) {
@@ -196,7 +162,7 @@ class CookieController extends FrameworkBundleAdminController
             );
         }
 
-        return $this->redirectToRoute('ps_demodoctrine_quote_index');
+        return $this->redirectToRoute('ds_gprdcookie_cookie_index');
     }
 
     /**
@@ -208,8 +174,8 @@ class CookieController extends FrameworkBundleAdminController
      */
     public function deleteBulkAction(Request $request)
     {
-        $quoteIds = $request->request->get('quote_bulk');
-        $repository = $this->get('prestashop.module.demodoctrine.repository.quote_repository');
+        $quoteIds = $request->request->get('cookie_bulk');
+        $repository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
         try {
             $quotes = $repository->findById($quoteIds);
         } catch (EntityNotFoundException $e) {
@@ -229,7 +195,7 @@ class CookieController extends FrameworkBundleAdminController
             );
         }
 
-        return $this->redirectToRoute('ps_demodoctrine_quote_index');
+        return $this->redirectToRoute('ds_gprdcookie_cookie_index');
     }
 
     /**
@@ -239,15 +205,10 @@ class CookieController extends FrameworkBundleAdminController
     {
         return [
             'add' => [
-                'desc' => $this->trans('Add new quote', 'Modules.Demodoctrine.Admin'),
+                'desc' => $this->trans('Add new cookie', 'Modules.DsGPRDCookie.Admin'),
                 'icon' => 'add_circle_outline',
-                'href' => $this->generateUrl('ps_demodoctrine_quote_create'),
-            ],
-            'generate' => [
-                'desc' => $this->trans('Generate quotes', 'Modules.Demodoctrine.Admin'),
-                'icon' => 'add_circle_outline',
-                'href' => $this->generateUrl('ps_demodoctrine_quote_generate'),
-            ],
+                'href' => $this->generateUrl('ds_gprdcookie_cookie_create'),
+            ]
         ];
     }
 }
