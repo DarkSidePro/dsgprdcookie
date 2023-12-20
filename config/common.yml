@@ -1,2 +1,13 @@
 services:
-    
+    darkside.module.dsgprd.repository.cookie_repository:
+        class: DarkSide\DsGPRDCookie\Repository\CookieRepository
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - DarkSide\DsGPRDCookie\Entity\Cookie
+
+    darkside.module.dsgprd.cookies.install:
+        class: DarkSide\DsGPRDCookie\Database\CookieInstaller
+        arguments:
+            - '@doctrine.dbal.default_connection'
+            - '%database_prefix%'
