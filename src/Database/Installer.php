@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsOmnibus\Database;
+namespace DarkSide\DsGPRDCookie\Database;
 
 use Context;
 use Db;
