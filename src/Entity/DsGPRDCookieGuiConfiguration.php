@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsOmnibus\Entity;
+namespace DarkSide\DsGPRDCookie\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="DarkSide\DsOmnibus\Repository\PriceHistoryShopRepository")
+ * @ORM\Entity(repositoryClass="DarkSide\DsGPRDCookie\Repository\PriceHistoryShopRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class DsGPRDCookieGuiConfiguration
@@ -33,48 +33,20 @@ class DsGPRDCookieGuiConfiguration
     private $id;
 
     /**
-     * @var int
+     * @var string
      * 
-     * @ORM\Column(name="id_shop", type="integer")
+     * @ORM\Column(name="field", type="string", length: 255)
      */
-    private $id_shop;
+    private string $field;
 
     /**
-     * @var int
-     * 
-     * @ORM\Column(name="id_product", type="integer")
+     * @ORM\OneToMany(targetEntity=DsGPRDCookieGuiConfigurationValue::class, mappedBy="gui")
      */
-    private $product;
-
-    /**
-     * @ORM\OneToMany(targetEntity="DsPriceAttributeHistoryShop", mappedBy="priceHistoryShop")
-     */
-    private $priceAttributeHistoriesShops;
-
-    /**
-     * @var float
-     * 
-     * @ORM\Column(name="wholesale_price", type="decilmal", precision=20, scale=6)
-     */
-    private float $wholesale_price;
-
-    /**
-     * @var float
-     * 
-     * @ORM\Column(name="price", type="decimal", precision=20, scale=6)
-     */
-    private float $price;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="date_add", type="datetime")
-     */
-    private $dateAdd;
+    private Collection|DsGPRDCookieGuiConfigurationValue $values;
 
     public function __construct()
     {
-        $this->priceAttributeHistoriesShops = new ArrayCollection();
+        $this->values = new ArrayCollection();
     }
 
     /**
@@ -85,144 +57,54 @@ class DsGPRDCookieGuiConfiguration
         return $this->id;
     }
 
-     /**
-     * @param int $id_shop
-     * 
-     * @return void
-     */
-    public function setShopId(int $id_shop): void
-    {
-        $this->id_shop = $id_shop;
-    }
-
     /**
-     * @return int
+     * @return string
      */
-    public function getShopId(): int
+    public function getField(): string
     {
-        return $this->id_shop;
+        return $this->field;
     }
-
+    
+    
     /**
-     * Set product
+     * @param string $field
      * 
-     * @param int
-     * 
-     * @return $this
+     * @return self
      */
-    public function setProduct(int $product)
+    public function setField(string $field): self
     {
-        $this->product = $product;
+        $this->field = $field;
 
         return $this;
     }
 
     /**
-     * Get product
-     * 
-     * @return int $product
+     * @return Collection|DsGPRDCookieGuiConfigurationValue[]
      */
-    public function getProduct(): int
+    public function getValues(): Collection
     {
-        return $this->product;
+        return $this->values;
     }
 
-    /**
-     * @return Collection|PriceAttributeHistoryShop[]
-     */
-    public function getPriceAttributeHistoriesShops(): Collection
+    public function addValue(DsGPRDCookieGuiConfigurationValue $value): self
     {
-        return $this->priceAttributeHistoriesShops;
-    }
-
-    /**
-     * @param PriceAttributeHistoryShop $priceAttributeHistoryShop
-     */
-    public function addPriceAttributeHistoryShop(DsPriceAttributeHistoryShop $priceAttributeHistoryShop)
-    {
-        $this->priceAttributeHistoriesShops->add($priceAttributeHistoryShop);
-        $priceAttributeHistoryShop->setPriceHistoryShop($this);
-    }
-
-    /**
-     * @param PriceAttributeHistoryShop $priceAttributeHistoryShop
-     */
-    public function removePriceAttributeHistoryShop(DsPriceAttributeHistoryShop $priceAttributeHistoryShop)
-    {
-        $this->priceAttributeHistoriesShops->removeElement($priceAttributeHistoryShop);
-        $priceAttributeHistoryShop->setPriceHistoryShop(null);
-    }
-
-    /**
-     * @return float
-     */
-    public function getWholesalePrice(): float
-    {
-        return $this->wholesale_price;
-    }
-
-    /**
-     * @param float $wholesale_price
-     * 
-     * @return void
-     */
-    public function setWholesalePrice(float $wholesale_price): void
-    {
-        $this->wholesale_price = $wholesale_price;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    /**
-     * @param float $price
-     * 
-     * @return void
-     */
-    public function setPrice(float $price): void
-    {
-        $this->price = $price;
-    }
-
-    /**
-     * Set dateAdd.
-     *
-     * @param DateTime $dateAdd
-     *
-     * @return $this
-     */
-    public function setDateAdd(DateTime $dateAdd)
-    {
-        $this->dateAdd = $dateAdd;
-
-        return $this;
-    }
-
-    /**
-     * Get dateAdd.
-     *
-     * @return DateTime
-     */
-    public function getDateAdd()
-    {
-        return $this->dateAdd;
-    }
-
-    /**
-     * Now we tell doctrine that before we persist or update we call the updatedTimestamps() function.
-     *
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function updatedTimestamps()
-    {
-        if ($this->getDateAdd() == null) {
-            $this->setDateAdd(new DateTime());
+        if (!$this->values->contains($value)) {
+            $this->values[] = $value;
+            $value->getGui($this);
         }
+
+        return $this;
+    }
+
+    public function removeValue(DsGPRDCookieGuiConfigurationValue $value): self
+    {
+        if ($this->values->removeElement($value)) {
+            // set the owning side to null (unless already changed)
+            if ($value->getGui() === $this) {
+                $value->setGui(null);
+            }
+        }
+
+        return $this;
     }
 }

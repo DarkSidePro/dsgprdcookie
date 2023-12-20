@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsOmnibus\Entity;
+namespace DarkSide\DsGPRDCookie\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="DarkSide\DsOmnibus\Repository\SpecificPriceHistoryShopRepository")
+ * @ORM\Entity(repositoryClass="DarkSide\DsGPRDCookie\Repository\SpecificPriceHistoryShopRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class DsGPRDCookieFieldLang
@@ -35,46 +35,25 @@ class DsGPRDCookieFieldLang
     /**
      * @var int
      * 
-     * @ORM\Column(name="id_shop_default", type="integer")
+     * @ORM\Column(name="id_lang", type="integer")
      */
-    private $id_shop_default;
+    private int $id_lang;
 
     /**
-     * @var int
+     * @var string
      * 
-     * @ORM\Column(name="id_product", type="integer")
+     * @ORM\Column(name="text_value", type="string", length: 4096)
      */
-    private $id_product;
+    private string $text_value;
 
-    /**
-     * @var float
-     * 
-     * @ORM\Column(name="wholesale_price", type="decilmal", precision=20, scale=6)
+     /**
+     * @ORM\ManyToOne(targetEntity=DsGPRDCookieField::class, inversedBy="langs")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private float $wholesale_price;
-
-    /**
-     * @var float
-     * 
-     * @ORM\Column(name="price", type="decimal", precision=20, scale=6)
-     */
-    private float $price;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="date_add", type="datetime")
-     */
-    private $dateAdd;
-
-    /**
-     * @ORM\OneToMany(targetEntity="PriceAttributeHistory", mappedBy="priceHistory")
-     */
-    private $priceAttributeHistories;
+    private Collection|DsGPRDCookieField $field;
 
     public function __construct()
     {
-        $this->priceAttributeHistories = new ArrayCollection();
     }
 
     /**
@@ -86,138 +65,62 @@ class DsGPRDCookieFieldLang
     }
 
     /**
-     * @param int $id_shop_default
-     * 
-     * @return void
-     */
-    public function setIdShopDefault(int $id_shop_default): void
-    {
-        $this->id_shop_default = $id_shop_default;
-    }
-
-    /**
      * @return int
      */
-    public function getIdShopDefault()
+    public function getIdLang(): int
     {
-        return $this->id_shop_default;
+        return $this->id_lang;
     }
 
     /**
-     * @return int
-     */
-    public function getIdProduct()
-    {
-        return $this->id_product;
-    }
-
-    /**
-     * @param int $id_product
+     * @param int $id_lang
      * 
-     * @return void
+     * @return self
      */
-    public function setIdProduct(int $id_product): void
+    public function setIdLang(int $id_lang): self
     {
-        $this->id_product = $id_product;
-    }
-
-    /**
-     * @return float
-     */
-    public function getWholesalePrice(): float
-    {
-        return $this->wholesale_price;
-    }
-
-    /**
-     * @param float $wholesale_price
-     * 
-     * @return void
-     */
-    public function setWholesalePrice(float $wholesale_price): void
-    {
-        $this->wholesale_price = $wholesale_price;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    /**
-     * @param float $price
-     * 
-     * @return void
-     */
-    public function setPrice(float $price): void
-    {
-        $this->price = $price;
-    }
-
-    /**
-     * Set dateAdd.
-     *
-     * @param DateTime $dateAdd
-     *
-     * @return $this
-     */
-    public function setDateAdd(DateTime $dateAdd)
-    {
-        $this->dateAdd = $dateAdd;
+        $this->id_lang = $id_lang;
 
         return $this;
     }
 
     /**
-     * Get dateAdd.
-     *
-     * @return DateTime
+     * @return string
      */
-    public function getDateAdd()
+    public function getTextValue(): string 
     {
-        return $this->dateAdd;
+        return $this->text_value;    
     }
 
     /**
-     * @return Collection|PriceAttributeHistory[]
+     * @param string $text_value
+     * 
+     * @return self
      */
-    public function getPriceAttributeHistories(): Collection
+    public function setTextValue(string $text_value): self
     {
-        return $this->priceAttributeHistories;
+        $this->text_value = $text_value;
+
+        return $this;
     }
 
     /**
-     * @param PriceAttributeHistory $priceAttributeHistory
+     * @return DsGPRDCookieField
      */
-    public function addPriceAttributeHistory(PriceAttributeHistory $priceAttributeHistory)
+    public function getField() : DsGPRDCookieField 
     {
-        $this->priceAttributeHistories->add($priceAttributeHistory);
-        $priceAttributeHistory->setPriceHistory($this);
+        return $this->field;    
     }
 
     /**
-     * @param PriceAttributeHistory $priceAttributeHistory
+     * @param ?DsGPRDCookieField $field
+     * 
+     * @return self
      */
-    public function removePriceAttributeHistory(PriceAttributeHistory $priceAttributeHistory)
+    public function setField(?DsGPRDCookieField $field): self
     {
-        $this->priceAttributeHistories->removeElement($priceAttributeHistory);
-        $priceAttributeHistory->setPriceHistory(null);
-    }
+        $this->field = $field;
 
-
-    /**
-     * Now we tell doctrine that before we persist or update we call the updatedTimestamps() function.
-     *
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function updatedTimestamps()
-    {
-        if ($this->getDateAdd() == null) {
-            $this->setDateAdd(new DateTime());
-        }
+        return $this;
     }
 }

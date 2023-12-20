@@ -9,14 +9,16 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsOmnibus\Entity;
+namespace DarkSide\DsGPRDCookie\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="DarkSide\DsOmnibus\Repository\PriceAttributeHistoryRepository")
+ * @ORM\Entity(repositoryClass="DarkSide\DsGPRDCookie\Repository\PriceAttributeHistoryRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class DsGPRDCookie
@@ -33,46 +35,54 @@ class DsGPRDCookie
     /**
      * @var int
      * 
-     * @ORM\Column(name="id_product_attribute", type="integer")     
+     * @ORM\Column(name="id_shop", type="integer")     
      */
-    private int $id_product_attribute;
+    private int $id_shop;
 
     /**
-     * @var int
+     * @var string
      * 
-     * @ORM\Column(name="id_product", type="integer")
+     * @ORM\Column(name="cookie_service", type="string", length: 255)
      */
-    private int $id_product;
+    private string $cookie_service;
 
     /**
-     * @var float
+     * @var DsGPRDCookieCategory
      * 
-     * @ORM\Column(name="wholesale_price", type="decilmal", precision=20, scale=6)
+     * @ORM\OneToOne(targetEntity="DsGPRDCookieCategory", mappedBy="cookie", cascade={"persist". "remove"})
      */
-    private float $wholesale_price;
+    private DsGPRDCookieCategory $cookie_category;
 
     /**
-     * @var float
+     * @var string
      * 
-     * @ORM\Column(name="price", type="decimal", precision=20, scale=6)
+     * @ORM\Column(name="cookie_name", type="string", length: 255)
      */
-    private float $price;
+    private float $cookie_name;
 
     /**
-     * @var DateTime
+     * @var bool
      *
-     * @ORM\Column(name="date_add", type="datetime")
+     * @ORM\Column(name="enabled", type="datetime")
      */
-    private $dateAdd;
+    private $enabled;
+
+    /**
+     * @var Collection|DsGPRDCookieLang[]
+     * 
+     * @ORM\OneToMany(targetEntity=DsGPRDCookieLang::class, mappedBy="cookie")
+     */
+    private Collection|DsGPRDCookieLang $cookie_langs;
 
     public function __construct()
     {
+        $this->cookie_langs = new ArrayCollection();
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -80,110 +90,123 @@ class DsGPRDCookie
     /**
      * @return int
      */
-    public function getIdProductAttribute(): int
+   public function getIdShop(): int
+   {
+        return $this->id_shop;
+   }
+
+   /**
+    * @param int $id_shop
+    *
+    * @return self 
+    */
+   public function setIdShop(int $id_shop): self
+   {
+        $this->id_shop = $id_shop;
+
+        return $this;
+   }
+ 
+   /**
+    * @return string
+    */
+    public function getCookieService(): string
     {
-        return $this->id_product_attribute;
+        return $this->cookie_service;
     }
 
     /**
-     * @param int $id_product_attribute
+     * @return DsGPRDCookieCategory
+     */
+    public function getCookieCategory(): DsGPRDCookieCategory
+    {
+        return $this->cookie_category;
+    }
+
+    /**
+     * @param DsGPRDCookieCategory $cookie_category
      * 
-     * @return void
+     * @return self
      */
-    public function setIdProductAttribute(int $id_product_attribute): void
+    public function setCookieCategory(DsGPRDCookieCategory $cookie_category): self
     {
-        $this->id_product_attribute = $id_product_attribute;
-    }
+        if ($cookie_category->getCookie() !== $this) {
+            $cookie_category->setCookie($this);
+        }
 
-
-    /**
-     * @return int
-     */
-    public function getProductId(): int
-    {
-        return $this->id_product;
-    }
-
-    /**
-     * @param int
-     * 
-     * @return void
-     */
-    public function setPriceHistory(int $id_product): void
-    {
-        $this->id_product = $id_product;
-    }
-
-     /**
-     * @return float
-     */
-    public function getWholesalePrice(): float
-    {
-        return $this->wholesale_price;
-    }
-
-    /**
-     * @param float $wholesale_price
-     * 
-     * @return void
-     */
-    public function setWholesalePrice(float $wholesale_price): void
-    {
-        $this->wholesale_price = $wholesale_price;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    /**
-     * @param float $price
-     * 
-     * @return void
-     */
-    public function setPrice(float $price): void
-    {
-        $this->price = $price;
-    }
-
-    /**
-     * Set dateAdd.
-     *
-     * @param DateTime $dateAdd
-     *
-     * @return $this
-     */
-    public function setDateAdd(DateTime $dateAdd)
-    {
-        $this->dateAdd = $dateAdd;
+        $this->cookie_category = $cookie_category;
 
         return $this;
     }
 
     /**
-     * Get dateAdd.
-     *
-     * @return DateTime
+     * @return string
      */
-    public function getDateAdd()
+    public function getCookieName(): string
     {
-        return $this->dateAdd;
+        return $this->cookie_name;
     }
 
     /**
-     * Now we tell doctrine that before we persist or update we call the updatedTimestamps() function.
-     *
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
+     * @param string $cookie_name
+     * 
+     * @return self
      */
-    public function updatedTimestamps()
+    public function setCookieName(string $cookie_name): self
     {
-        if ($this->getDateAdd() == null) {
-            $this->setDateAdd(new DateTime());
-        }
+        $this->cookie_name = $cookie_name;
+
+        return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param bool $enabled
+     * 
+     * @return self
+     */
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DsGPRDCookieLang[]
+     */
+    public function getLangs(): Collection
+    {
+        return $this->cookie_langs;
+    }
+
+    public function addLang(DsGPRDCookieLang $lang): self
+    {
+        if (!$this->cookie_langs->contains($lang)) {
+            $this->cookie_langs[] = $lang;
+            $lang->setCookie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComponent(DsGPRDCookieLang $lang): self
+    {
+        if ($this->cookie_langs->removeElement($lang)) {
+            // set the owning side to null (unless already changed)
+            if ($lang->getCookie() === $this) {
+                $lang->setCookie(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

@@ -9,14 +9,16 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsOmnibus\Entity;
+namespace DarkSide\DsGPRDCookie\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="DarkSide\DsOmnibus\Repository\PriceAttributeHistoryRepository")
+ * @ORM\Entity(repositoryClass="DarkSide\DsGPRDCookie\Repository\PriceAttributeHistoryRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class DsGPRDCookieCategory
@@ -31,42 +33,31 @@ class DsGPRDCookieCategory
     private int $id;
 
     /**
-     * @var int
-     * 
-     * @ORM\Column(name="id_product_attribute", type="integer")     
+     * @ORM\Column(type="boolean")
      */
-    private int $id_product_attribute;
+    private bool $default_enabled;
 
     /**
-     * @var int
-     * 
-     * @ORM\Column(name="id_product", type="integer")
+     * @ORM\Column(type="boolean")
      */
-    private int $id_product;
+    private bool $readonly;
+
+    /** @Column(type="string", columnDefinition="ENUM('necessary', 'analytics', 'ads', '')") */
+    private string $type;
 
     /**
-     * @var float
-     * 
-     * @ORM\Column(name="wholesale_price", type="decilmal", precision=20, scale=6)
+     * @ORM\OneToOne(targetEntity=DsGPRDCookie::class, mappedBy="cookie_category", cascade={"persist", "remove"})
      */
-    private float $wholesale_price;
+    private DsGPRDCookie $cookie;
 
     /**
-     * @var float
-     * 
-     * @ORM\Column(name="price", type="decimal", precision=20, scale=6)
+     * @ORM\OneToMany(targetEntity=DsGPRDCookieCategoryLangs::class, mappedBy="category")
      */
-    private float $price;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="date_add", type="datetime")
-     */
-    private $dateAdd;
+    private Collection|DsGPRDCookieCategoryLang $category_langs;
 
     public function __construct()
     {
+        $this->category_langs = new ArrayCollection();
     }
 
     /**
@@ -78,112 +69,120 @@ class DsGPRDCookieCategory
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getIdProductAttribute(): int
+    public function getDefaultEnabled(): bool
     {
-        return $this->id_product_attribute;
+        return $this->default_enabled;
     }
 
     /**
-     * @param int $id_product_attribute
+     * @param bool $default_enabled
      * 
-     * @return void
+     * @return self
      */
-    public function setIdProductAttribute(int $id_product_attribute): void
+    public function setDefaultEnabled(bool $default_enabled): self
     {
-        $this->id_product_attribute = $id_product_attribute;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getProductId(): int
-    {
-        return $this->id_product;
-    }
-
-    /**
-     * @param int
-     * 
-     * @return void
-     */
-    public function setPriceHistory(int $id_product): void
-    {
-        $this->id_product = $id_product;
-    }
-
-     /**
-     * @return float
-     */
-    public function getWholesalePrice(): float
-    {
-        return $this->wholesale_price;
-    }
-
-    /**
-     * @param float $wholesale_price
-     * 
-     * @return void
-     */
-    public function setWholesalePrice(float $wholesale_price): void
-    {
-        $this->wholesale_price = $wholesale_price;
-    }
-
-    /**
-     * @return float
-     */
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    /**
-     * @param float $price
-     * 
-     * @return void
-     */
-    public function setPrice(float $price): void
-    {
-        $this->price = $price;
-    }
-
-    /**
-     * Set dateAdd.
-     *
-     * @param DateTime $dateAdd
-     *
-     * @return $this
-     */
-    public function setDateAdd(DateTime $dateAdd)
-    {
-        $this->dateAdd = $dateAdd;
+        $this->default_enabled = $default_enabled;
 
         return $this;
     }
 
     /**
-     * Get dateAdd.
-     *
-     * @return DateTime
+     * @return bool
      */
-    public function getDateAdd()
+    public function getReadonly(): bool
     {
-        return $this->dateAdd;
+        return $this->readonly;
     }
 
     /**
-     * Now we tell doctrine that before we persist or update we call the updatedTimestamps() function.
-     *
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
+     * @param bool @readonly
+     * 
+     * @return self
      */
-    public function updatedTimestamps()
+    public function setReadonly(bool $readonly): self
     {
-        if ($this->getDateAdd() == null) {
-            $this->setDateAdd(new DateTime());
+        $this->readonly = $readonly;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * 
+     * @return $this
+     */
+    public function setType(string $type): self
+    {
+        $expectedValue = ['necessary', 'analytics', 'ads', ''];
+
+        if (in_array($type, $expectedValue)) {
+            $this->type = $type;
         }
+
+        return $this;
+    }
+
+    /**
+     * @return DsGPRDCookie
+     */
+    public function getCookie(): DsGPRDCookie
+    {
+        return $this->cookie;
+    }
+
+    /**
+     * @param DsGPRDCookie $cookie
+     * 
+     * @return self
+     */
+    public function setCookie(DsGPRDCookie $cookie): self
+    {
+        if ($cookie->getCookieCategory() !== $this) {
+            $cookie->setCookieCategory($this);
+        }
+
+        $this->cookie = $cookie;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|DsGPRDCookieCategoryLang[]
+     */
+    public function getCategoryLangs(): Collection
+    {
+        return $this->category_langs;
+    }
+
+    public function addMilkParameter(DsGPRDCookieCategoryLang $lang): self
+    {
+        if (!$this->category_langs->contains($lang)) {
+            $this->category_langs[] = $lang;
+            $lang->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMilkParameter(DsGPRDCookieCategoryLang $lang): self
+    {
+        if ($this->category_langs->removeElement($lang)) {
+            // set the owning side to null (unless already changed)
+            if ($lang->getCategory() === $this) {
+                $lang->setCategory(null);
+            }
+        }
+
+        return $this;
     }
 }

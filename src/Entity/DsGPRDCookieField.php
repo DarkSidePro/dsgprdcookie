@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsOmnibus\Entity;
+namespace DarkSide\DsGPRDCookie\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="DarkSide\DsOmnibus\Repository\SpecificPriceHistoryShopRepository")
+ * @ORM\Entity(repositoryClass="DarkSide\DsGPRDCookie\Repository\SpecificPriceHistoryShopRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class DsGPRDCookieField
@@ -33,65 +33,20 @@ class DsGPRDCookieField
     private int $id;
 
     /**
-     * @var int
-     * 
-     * @ORM\Column(name="id_specific_price", type="integer")
-     */
-    private int $id_specific_price;
-
-    /**
-     * @var int
-     * 
-     * @ORM\Column(name="id_product", type="integer")
-     */
-    private int $id_product;
-
-
-    /**
-     * @var float
-     * 
-     * @ORM\Column(name="price", type="decimal", precision=20, scale=6)
-     */
-    private float $price;
-
-    /**
-     * @var float
-     * 
-     * @ORM\Column(name="reduction", type="decimal", precision=20, scale=6)
-     */
-    private float $reduction;
-
-    /**
-     * @var int
-     * 
-     * @ORM\Column(name="reduction_tax", type="integer")
-     */
-    private int $reduction_tax;
-
-    /**
      * @var string
      * 
-     * @ORM\Column(name="reduction_type", type="string", columnDefinition="ENUM('amount','percentage')")
+     * @ORM\Column(name="field_name", type="string", length: 255)
      */
-    private string $reduction_type;
+    private string $field_name;
 
     /**
-     * @var int
-     * 
-     * @ORM\Column(name="id_shop", type="integer")
+     * @ORM\OneToMany(targetEntity=DsGPRDCookieFieldLang::class, mappedBy="field")
      */
-    private int $id_shop;
-
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(name="date_add", type="datetime")
-     */
-    private $dateAdd;
-
+    private Collection|DsGPRDCookieFieldLang $langs;
 
     public function __construct()
     {
+        $this->langs = new ArrayCollection();
     }
 
     /**
@@ -103,165 +58,40 @@ class DsGPRDCookieField
     }
 
     /**  
-     * @return int
-     */    
-    public function getSpecificPriceId(): int
-    {
-        return $this->id_specific_price;
-    }
-
-    /**
-     * @param int
-     * 
-     * @return void
-     */
-    public function setSpecificPriceId(int $id_specific_price): void
-    {
-        $this->id_specific_price = $id_specific_price;
-    }
-
-    public function setProducId(int $id_product): void
-    {
-        $this->id_product = $id_product;
-    }
-
-    public function getProductId(): int
-    {
-        return $this->id_product;
-    }
-
-    /**
-     * Price from reduction is made
-     * 
-     * @return float
-     */
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    /**
-     * @param float
-     * 
-     * @return void
-     */
-    public function setPrice(float $price): void
-    {
-        $this->price = $price;
-    }
-
-    /**
-     * Reduction amount value 
-     * 
-     * @return float
-     */
-    public function getReduction(): float
-    {
-        return $this->reduction;
-    }
-
-    /**
-     * @param float
-     * 
-     * @return void
-     */
-    public function setReduction(float $reduction): void
-    {
-        $this->reduction = $reduction;
-    }
-
-    /**
-     * With or without tax
-     * 
-     * @return int
-     */
-    public function getReductionTax(): int
-    {
-        return $this->reduction_tax;
-    }
-
-    /**
-     * @param int
-     * 
-     * @return void
-     */
-    public function setReductionTax(int $reduction_tax): void
-    {
-        $this->reduction_tax = $reduction_tax;
-    }
-
-    /**
-     * Reduction type: amount or percentage
-     * 
      * @return string
-     */
-    public function getReductionType(): string
+     */    
+    public function getFieldName(): string
     {
-        return $this->reduction_type;
+        return $this->field_name;
     }
 
     /**
-     * @param string
-     * 
-     * @return void
+     * @return Collection|DsGPRDCookieFieldLang[]
      */
-    public function setReductionType(string $reduction_type): void
+    public function getLangs(): Collection
     {
-        $this->reduction_type = $reduction_type;
-    } 
+        return $this->langs;
+    }
 
-    /**
-     * Set dateAdd.
-     *
-     * @param DateTime $dateAdd
-     *
-     * @return $this
-     */
-    private function setDateAdd(DateTime $dateAdd)
+    public function addAnimalModel(DsGPRDCookieFieldLang $lang): self
     {
-        $this->dateAdd = $dateAdd;
+        if (!$this->langs->contains($lang)) {
+            $this->langs[] = $lang;
+            $lang->setField($this);
+        }
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getShopId(): int
+    public function removeAnimalModel(DsGPRDCookieFieldLang $lang): self
     {
-        return $this->id_shop;
-    }
-
-    /**
-     * @param int
-     * 
-     * @return void
-     */
-    public function setShopId(int $id_shop): void
-    {
-        $this->id_shop = $id_shop;
-    }
-
-    /**
-     * Get dateAdd.
-     *
-     * @return DateTime
-     */
-    public function getDateAdd()
-    {
-        return $this->dateAdd;
-    }
-
-    /**
-     * Now we tell doctrine that before we persist or update we call the updatedTimestamps() function.
-     *
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function updatedTimestamps()
-    {
-        if ($this->getDateAdd() == null) {
-            $this->setDateAdd(new DateTime());
+        if ($this->langs->removeElement($lang)) {
+            // set the owning side to null (unless already changed)
+            if ($lang->getField() === $this) {
+                $lang->setField(null);
+            }
         }
+
+        return $this;
     }
 }
