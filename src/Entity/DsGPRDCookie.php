@@ -116,6 +116,18 @@ class DsGPRDCookie
     }
 
     /**
+     * @param string $cookie_service
+     * 
+     * @return self
+     */
+    public function setCookieService(string $cookie_service): self
+    {
+        $this->cookie_service = $cookie_service;
+
+        return $this;
+    }
+
+    /**
      * @return DsGPRDCookieCategory
      */
     public function getCookieCategory(): DsGPRDCookieCategory
@@ -197,7 +209,7 @@ class DsGPRDCookie
         return $this;
     }
 
-    public function removeComponent(DsGPRDCookieLang $lang): self
+    public function removeLang(DsGPRDCookieLang $lang): self
     {
         if ($this->cookie_langs->removeElement($lang)) {
             // set the owning side to null (unless already changed)
@@ -207,6 +219,22 @@ class DsGPRDCookie
         }
 
         return $this;
+    }
+
+    /**
+     * @param int $langId
+     * 
+     * @return DsGPRDCookieLang|null
+     */
+    public function getCookieLangByLangId(int $langId)
+    {
+        foreach ($this->cookie_langs as $cookieLang) {
+            if ($langId === $cookieLang->getIdLang()) {
+                return $cookieLang;
+            }
+        }
+
+        return null;
     }
 
 }
