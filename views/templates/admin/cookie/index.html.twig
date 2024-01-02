@@ -24,7 +24,7 @@
 {% block javascripts %} 
     {{ parent() }}
     <script>
-        const gridId = "ds_cookie";
+        const gridId = "ds_cookie_cookie";
         const grid = new window.prestashop.component.Grid(gridId);
         grid.addExtension(new window.prestashop.component.GridExtensions.ColumnTogglingExtension());
         grid.addExtension(new window.prestashop.component.GridExtensions.ExportToSqlManagerExtension());
@@ -34,8 +34,12 @@
         grid.addExtension(new window.prestashop.component.GridExtensions.SubmitRowActionExtension());
         grid.addExtension(new window.prestashop.component.GridExtensions.ReloadListExtension());
         grid.addExtension(new window.prestashop.component.GridExtensions.SortingExtension());
-        grid.addExtension(new window.prestashop.component.GridExtensions.LinkRowActionExtension());
-        grid.addExtension(new window.prestashop.component.GridExtensions.ColumnTogglingExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.LinkRowActionExtension());        
+        grid.addExtension(new window.prestashop.component.GridExtensions.AsyncToggleColumnExtension());    
+        grid.addExtension(new window.prestashop.component.GridExtensions.BulkActionCheckboxExtension());    
+        grid.addExtension(new window.prestashop.component.GridExtensions.ChoiceExtension());    
+        grid.addExtension(new window.prestashop.component.GridExtensions.FiltersSubmitButtonEnablerExtension());    
+        grid.addExtension(new window.prestashop.component.GridExtensions.ModalFormSubmitExtension());    
     </script>
     <script src="{{ asset('themes/default/js/bundle/pagination.js') }}"></script>
 {% endblock %}

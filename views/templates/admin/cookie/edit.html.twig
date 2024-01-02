@@ -14,13 +14,11 @@
 {% block content %}
     <div class="row justify-content-center">
         <div class="col">
-            {% include '@Modules/demodoctrine/views/templates/admin/form.html.twig' %}
+            {% include '@Modules/dsgprdcookie/views/templates/admin/cookie/form.html.twig' %}
         </div>
     </div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-
-    <script src="{{ asset('../modules/demodoctrine/views/js/quote_form.bundle.js') }}"></script>
 {% endblock %}
