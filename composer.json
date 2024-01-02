@@ -11,7 +11,9 @@
         }
     ],
     "autoload": {
-        "classmap": ["src"],
+        "psr-4": {
+            "DarkSide\\DsGprdCookie\\": "src/"
+        },
         "config": {
             "prepend-autoloader": false
         },
