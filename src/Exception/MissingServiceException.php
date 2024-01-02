@@ -2,9 +2,9 @@
 
     namespace DarkSide\DsGprdCookie\Exception;
 
-    use PrestaShop\PrestaShop\Core\Exception\PrestaShopException;
+    use PrestaShopExceptionCore;
 
-    class MissingServiceException extends PrestaShopException
+    class MissingServiceException extends PrestaShopExceptionCore
     {
         /**
          * @param string $service
