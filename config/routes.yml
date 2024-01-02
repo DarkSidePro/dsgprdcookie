@@ -33,14 +33,6 @@ ds_gprdcookie_cookie_create:
     methods: [GET, POST]
     controller: 'DarkSide\DsGprdCookie\Controller\Admin\CookieController::createAction'
 
-ds_gprdcookie_cookie_field_create:
-    path: /dsgprdcookie/cookie/field/new
-    methods: [GET, POST]
-    defaults:
-        _controller: 'DarkSide\DsGprdCookie\Controller\Admin\CookieFieldController::createAction'
-        _legacy_controller: 'AdminDsGprdCookieField'
-        _legacy_link: 'AdminDsGprdCookieField:add'
-
 ds_gprdcookie_cookie_edit:
     path: /dsgprdcookie/cookies/{id}/edit
     methods: [GET, POST]
