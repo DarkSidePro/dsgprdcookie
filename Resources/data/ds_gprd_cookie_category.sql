@@ -4,6 +4,5 @@ CREATE TABLE IF NOT EXISTS `PREFIX_ds_gprd_cookie_category` (
   `readonly` tinyint(1) NOT NULL,
   `type` ENUM('necessary','analytics','ads','') NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  KEY `id` (`id`),
-  KEY `cookie_in_category_id` (`cookie_in_category_id`)
+  KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

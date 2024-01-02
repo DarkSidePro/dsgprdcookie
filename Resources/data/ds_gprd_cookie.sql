@@ -8,8 +8,7 @@ CREATE TABLE `ps_ds_gprd_cookie` (
 	`extra_script` TEXT NULL DEFAULT NULL COLLATE 'utf8mb3_unicode_ci',
 	`position` ENUM('header','footer') NOT NULL DEFAULT 'footer' COLLATE 'utf8mb3_unicode_ci',
 	PRIMARY KEY (`id`) USING BTREE,
-	INDEX `id` (`id`) USING BTREE,
-	INDEX `cookie_in_category` (`cookie_in_category`) USING BTREE
+	INDEX `id` (`id`) USING BTREE
 )
 COLLATE='utf8mb3_unicode_ci'
 ENGINE=InnoDB
