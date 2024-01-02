@@ -135,7 +135,12 @@ services:
             - '@prestashop.core.grid.filter.form_factory'
             - '@prestashop.core.hook.dispatcher'
     
-    DarkSidee\DsGprdCookie\Controller\Admin\CookieController:
+    DarkSide\DsGprdCookie\Controller\Admin\CookieController:
         class: DarkSidee\DsGprdCookie\Controller\Admin\CookieController
         arguments:
             - '@doctrine.cache.provider'
+
+    darkside.module.dsgprd.command.cookie_build_command:
+        class: 'DarkSide\DsGprdCookie\Command\CookieBuildCommand'
+        tags:
+            - { name: 'console.command' }
