@@ -9,12 +9,16 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Controller\Admin;
+namespace DarkSide\DsGprdCookie\Controller\Admin;
 
+use Context;
+use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
-use DarkSide\DsGPRDCookie\Grid\Filters\CookieFilters;
-use Grid\Definition\Factory\CookieGridDefinitionFactory;
+use DarkSide\DsGprdCookie\Grid\Filters\CookieFilters;
+use DarkSide\DsGprdCookie\Repository\CookieCategoryRepository;
+use DarkSide\DsGprdCookie\Repository\CookieFieldRepository;
+use DarkSide\DsGprdCookie\Repository\CookieRepository;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use PrestaShopBundle\Service\Grid\ResponseBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,22 +28,22 @@ use Symfony\Component\HttpFoundation\Response;
 class CookieController extends FrameworkBundleAdminController
 {
     /**
-     * List quotes
+     * List cookies
      *
-     * @param QuoteFilters $filters
+     * @param CookieFilters $filters
      *
      * @return Response
      */
-    public function indexAction(CookieFilters $filters)
+    public function indexAction(CookieFilters $filters): Response
     {
         $cookieGridFactory = $this->get('darkside.module.dsgprd.grid.factory.cookies');
         $dsCookieGrid = $cookieGridFactory->getGrid($filters);
 
         return $this->render(
-            '@Modules/dsgprdcookie/views/templates/admin/index.html.twig',
+            '@Modules/dsgprdcookie/views/templates/admin/cookie/index.html.twig',
             [
                 'enableSidebar' => true,
-                'layoutTitle' => $this->trans('Cookies', 'Modules.DsGPRDCookie.Admin'),
+                'layoutTitle' => $this->trans('Cookies', 'Modules.DsGprdCookie.Admin'),
                 'layoutHeaderToolbarBtn' => $this->getToolbarButtons(),
                 'ds_cookie' => $this->presentGrid($dsCookieGrid),
             ]
@@ -67,7 +71,7 @@ class CookieController extends FrameworkBundleAdminController
     }
 
     /**
-     * Create quote
+     * Create cookie
      *
      * @param Request $request
      *
@@ -75,12 +79,12 @@ class CookieController extends FrameworkBundleAdminController
      */
     public function createAction(Request $request)
     {
-        $quoteFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
-        $quoteForm = $quoteFormBuilder->getForm();
-        $quoteForm->handleRequest($request);
+        $cookieFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
+        $cookieForm = $cookieFormBuilder->getForm();
+        $cookieForm->handleRequest($request);
 
-        $quoteFormHandler = $this->get('darkside.module.dsgprd.form.identifiable_object.handler.cookie_form_handler');
-        $result = $quoteFormHandler->handle($quoteForm);
+        $cookieFormHandler = $this->get('darkside.module.dsgprd.form.identifiable_object.handler.cookie_form_handler');
+        $result = $cookieFormHandler->handle($cookieForm);
 
         if (null !== $result->getIdentifiableObjectId()) {
             $this->addFlash(
@@ -91,27 +95,27 @@ class CookieController extends FrameworkBundleAdminController
             return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
 
-        return $this->render('@Modules/dsgprdcookie/views/templates/admin/create.html.twig', [
-            'quoteForm' => $quoteForm->createView(),
+        return $this->render('@Modules/dsgprdcookie/views/templates/admin/cookie/create.html.twig', [
+            'cookieForm' => $cookieForm->createView(),
         ]);
     }
 
     /**
-     * Edit quote
+     * Edit cookie
      *
      * @param Request $request
-     * @param int $quoteId
+     * @param int $id
      *
      * @return Response
      */
-    public function editAction(Request $request, $quoteId)
+    public function editAction(Request $request, $id)
     {
-        $quoteFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
-        $quoteForm = $quoteFormBuilder->getFormFor((int) $quoteId);
-        $quoteForm->handleRequest($request);
+        $cookieFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
+        $cookieForm = $cookieFormBuilder->getFormFor((int) $id);
+        $cookieForm->handleRequest($request);
 
-        $quoteFormHandler = $this->get('darkside.module.dsgprd.form.identifiable_object.handler.cookie_form_handler');
-        $result = $quoteFormHandler->handleFor((int) $quoteId, $quoteForm);
+        $cookieFormHandler = $this->get('darkside.module.dsgprd.form.identifiable_object.handler.cookie_form_handler');
+        $result = $cookieFormHandler->handleFor((int) $id, $cookieForm);
 
         if ($result->isSubmitted() && $result->isValid()) {
             $this->addFlash('success', $this->trans('Successful update.', 'Admin.Notifications.Success'));
@@ -119,32 +123,32 @@ class CookieController extends FrameworkBundleAdminController
             return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
 
-        return $this->render('@Modules/dsgprdcookie/views/templates/admin/edit.html.twig', [
-            'quoteForm' => $quoteForm->createView(),
+        return $this->render('@Modules/dsgprdcookie/views/templates/admin/cookie/edit.html.twig', [
+            'cookieForm' => $cookieForm->createView(),
         ]);
     }
 
     /**
-     * Delete quote
+     * Delete cookie
      *
-     * @param int $quoteId
+     * @param int $cookieId
      *
      * @return Response
      */
-    public function deleteAction($quoteId)
+    public function deleteAction($cookieId)
     {
         $repository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
         
         try {
-            $quote = $repository->findOneById($quoteId);
+            $cookie = $repository->findOneById($cookieId);
         } catch (EntityNotFoundException $e) {
-            $quote = null;
+            $cookie = null;
         }
 
-        if (null !== $quote) {
+        if (null !== $cookie) {
             /** @var EntityManagerInterface $em */
             $em = $this->get('doctrine.orm.entity_manager');
-            $em->remove($quote);
+            $em->remove($cookie);
             $em->flush();
 
             $this->addFlash(
@@ -155,9 +159,9 @@ class CookieController extends FrameworkBundleAdminController
             $this->addFlash(
                 'error',
                 $this->trans(
-                    'Cannot find quote %quote%',
+                    'Cannot find cookie %cookie%',
                     'Modules.Demodoctrine.Admin',
-                    ['%quote%' => $quoteId]
+                    ['%cookie%' => $cookieId]
                 )
             );
         }
@@ -166,7 +170,7 @@ class CookieController extends FrameworkBundleAdminController
     }
 
     /**
-     * Delete bulk quotes
+     * Delete bulk cookies
      *
      * @param Request $request
      *
@@ -174,18 +178,18 @@ class CookieController extends FrameworkBundleAdminController
      */
     public function deleteBulkAction(Request $request)
     {
-        $quoteIds = $request->request->get('cookie_bulk');
+        $cookieIds = $request->request->get('cookie_bulk');
         $repository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
         try {
-            $quotes = $repository->findById($quoteIds);
+            $cookies = $repository->findById($cookieIds);
         } catch (EntityNotFoundException $e) {
-            $quotes = null;
+            $cookies = null;
         }
-        if (!empty($quotes)) {
+        if (!empty($cookies)) {
             /** @var EntityManagerInterface $em */
             $em = $this->get('doctrine.orm.entity_manager');
-            foreach ($quotes as $quote) {
-                $em->remove($quote);
+            foreach ($cookies as $cookie) {
+                $em->remove($cookie);
             }
             $em->flush();
 
@@ -205,10 +209,36 @@ class CookieController extends FrameworkBundleAdminController
     {
         return [
             'add' => [
-                'desc' => $this->trans('Add new cookie', 'Modules.DsGPRDCookie.Admin'),
+                'desc' => $this->trans('Add new cookie', 'Modules.DsGprdCookie.Admin'),
                 'icon' => 'add_circle_outline',
                 'href' => $this->generateUrl('ds_gprdcookie_cookie_create'),
             ]
         ];
+    }
+
+    /**
+     * Generate script
+     * 
+     * @return Response
+     */
+    public function buildAction(): Response
+    {
+        $cookieRepository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
+        $cookieFieldRepository = $this->get('darkside.module.dsgprd.repository.cookie_field_repository');
+        $cookieCategoryRepository = $this->get('darkside.module.dsgprd.repository.cookie_category_repository');
+
+        $id_shop = Context::getContext()->shop->id;
+        $id_lang = Context::getContext()->language->id;
+
+        $cookies = $cookieRepository->findAllActiveCookiesByShopId(['id_shop' => $id_shop]);
+        $fields = $cookieFieldRepository->findAll();
+        $categories = $cookieCategoryRepository->findAll();
+        
+
+        return $this->render('@Modules/dsgprdcookie/views/templates/admin/cookie/build.html.twig', [
+            'cookies' => $cookies,
+            'fields' => $fields,
+            'categories' => $categories
+        ]);
     }
 }
