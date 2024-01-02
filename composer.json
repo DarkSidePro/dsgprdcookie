@@ -1,6 +1,6 @@
 {
     "name": "darkside/dsgprdcookie",
-    "license": "AFL-3.0",
+    "license": "MIT",
     "authors": [{
             "name": "Patryk Tchórzewski",
             "email": "patryk@dark-side.pro"
