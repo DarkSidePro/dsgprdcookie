@@ -47,6 +47,9 @@ The module is released under the MIT license[MIT license](https://github.com/Dar
 
 We encourage and welcome contributions to the development of this module. Feel free to contribute to its enhancement, language support, or any other improvements. Join us in making privacy and compliance easy for PrestaShop users!
 
+### Support us
+[Buy me a coffie ☕](https://www.buymeacoffee.com/darksidepro "Buy me a coffie ☕")
+
 
 ------------
 
@@ -81,3 +84,6 @@ Licencja: Moduł jest wydany na [licencji MIT](https://github.com/DarkSidePro/ds
 ### Przyszły rozwój:
 Zachęcamy i zapraszamy do udziału w rozwoju tego modułu. Możesz przyczynić się do jego ulepszenia, wsparcia językowego lub innych ulepszeń. Dołącz do nas, aby ułatwić użytkownikom PrestaShop zachowanie prywatności i zgodności z przepisami!
 
+
+### Wspieraj nas
+[Postaw mi kawę ☕](https://www.buymeacoffee.com/darksidepro "Postaw mi kawę ☕")
