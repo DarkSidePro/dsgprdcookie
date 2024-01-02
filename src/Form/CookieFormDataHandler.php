@@ -9,13 +9,15 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Form;
+namespace DarkSide\DsGprdCookie\Form;
 
 use Context;
-use DarkSide\DsGPRDCookie\Entity\DsGPRDCookie;
-use DarkSide\DsGPRDCookie\Entity\DsGPRDCookieLang;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookie;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookieInCategory;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookieLang;
+use DarkSide\DsGprdCookie\Repository\CookieCategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use DarkSide\DsGPRDCookie\Repository\CookieRepository;
+use DarkSide\DsGprdCookie\Repository\CookieRepository;
 use PrestaShop\PrestaShop\Core\Form\IdentifiableObject\DataHandler\FormDataHandlerInterface;
 
 class CookieFormDataHandler implements FormDataHandlerInterface
@@ -23,22 +25,30 @@ class CookieFormDataHandler implements FormDataHandlerInterface
     /**
      * @var CookieRepository
      */
-    private $cookieRepository;
+    private CookieRepository $cookieRepository;
 
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
+
+    /**
+     * @var CookieCategoryRepository
+     */
+    private CookieCategoryRepository $categoryRepository;
 
     /**
      * @param CookieRepository $quoteRepository
+     * @param CookieCategoryRepository $categoryRepository
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         CookieRepository $cookieRepository,
+        CookieCategoryRepository $categoryRepository,
         EntityManagerInterface $entityManager,
     ) {
         $this->cookieRepository = $cookieRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->entityManager = $entityManager;
     }
 
@@ -53,22 +63,36 @@ class CookieFormDataHandler implements FormDataHandlerInterface
             return false;
         }
 
-        $cookie = new DsGPRDCookie;
+        $cookie = new DsGprdCookie;
         $cookie->setIdShop($data['id_shop']);
         $cookie->setEnabled($data['enabled']);
         $cookie->setCookieName($data['cookie_name']);
         $cookie->setCookieService($data['cookie_service']);
+        $cookie->setScript($data['script']);
+        $cookie->setExtraScript($data['extra_script']);
+        $cookie->setPosition($data['position']);
+
+        $this->entityManager->persist($cookie);
+        
+        $cookieInCategory = new DsGprdCookieInCategory;
+        $cookieInCategory->setCookie($cookie);
+        $cookieInCategory->setCategory($data['cookie_category']);
+
+        $this->entityManager->persist($cookieInCategory);
 
         foreach ($data['text_value'] as $langId => $langContent) {
-            $cookieLang = new DsGPRDCookieLang();
+            $cookieLang = new DsGprdCookieLang();
             $cookieLang
                 ->setIdLang($langId)
                 ->setTextValue($langContent)                
             ;
 
-            $cookie->addLang($cookieLang);
+            $cookieLang->setCookie($cookie);
+
+            $this->entityManager->persist($cookieLang);
+
         }
-        $this->entityManager->persist($cookie);
+        
         $this->entityManager->flush();
 
         return $cookie->getId();
@@ -83,31 +107,67 @@ class CookieFormDataHandler implements FormDataHandlerInterface
         $cookie->setEnabled($data['enabled']);
         $cookie->setCookieName($data['cookie_name']);
         $cookie->setCookieService($data['cookie_service']);
+        $cookie->setScript($data['script']);
+        $cookie->setExtraScript($data['extra_script']);
+        $cookie->setPosition($data['position']);
+
+        $cookieLangs = $cookie->getLangs();
+
+        $existingLangIds = $cookieLangs->map(function ($cookieLang) {
+            return $cookieLang->getIdLang();
+        });
         
-        foreach ($data['text_value'] as $langId => $content) {
-            $cookieLang = $cookie->getCookieLangByLangId($langId);
-            if (null === $cookieLang) {
-                continue;
+        foreach ($data['text_value'] as $langId => $langContent) {
+            if (!$existingLangIds->contains($langId)) {
+                // Dodajemy nowy rekord
+                $newCookieLang = new DsGprdCookieLang();
+                $newCookieLang
+                    ->setIdLang($langId)
+                    ->setTextValue($langContent);
+        
+                $cookieLangs->add($newCookieLang);
+                $this->entityManager->persist($newCookieLang);
+            } else {
+                // Aktualizujemy istniejący rekord
+                $cookieLang = $cookieLangs->filter(function ($cookieLang) use ($langId) {
+                    return $cookieLang->getIdLang() === $langId;
+                })->first();
+        
+                if ($cookieLang instanceof DsGprdCookieLang) {
+                    $cookieLang->setTextValue($langContent);
+                }
             }
-            $cookieLang
-                ->setTextValue($content['text_value'])                
-            ;
         }
+        
+
+        $cookieInCategories = $cookie->getCookieInCategories();
+
+        foreach ($cookieInCategories as $cic) {
+            $cic->setCategory($data['cookie_category']);
+        }
+
         $this->entityManager->flush();
 
         return $cookie->getId();
     }
 
     /**
-     * @param DsGPRDCookie $dsGPRDCookie
+     * @param DsGprdCookie $dsGPRDCookie
      */
-    public function delete(DsGPRDCookie $dsGPRDCookie)
+    public function delete(DsGprdCookie $dsGPRDCookie)
     {
         $langs = $dsGPRDCookie->getLangs();
 
         foreach ($langs as $lang) {
             $this->entityManager->remove($lang);
         }
+
+        $cookieInCategories = $dsGPRDCookie->getCookieInCategories();
+
+        foreach ($cookieInCategories as $item) {
+            $this->entityManager->remove($item);
+        }
+
 
         $this->entityManager->remove($dsGPRDCookie);
         $this->entityManager->flush();
