@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Database;
+namespace DarkSide\DsGprdCookie\Database;
 
 use Context;
 use Db;
@@ -33,16 +33,19 @@ class Installer
      * @var array
      */
     private const TABLES = [
-        'gprd_cookie.sql',
-        'gprd_cookie_lang.sql',
-        'gprd_cookie_category.sql',
-        'gprd_cookie_category_lang.sql',
-        'gprd_cookie_field.sql',
-        'gprd_cookie_field_lang.sql',
-        'gprd_cookie_gui_configuration.sql',
-        'gprd_cookie_gui_configuration_value.sql',
-        'alters.sql',
-        'default_data.sql'
+        'ds_gprd_cookie.sql',
+        'ds_gprd_cookie_lang.sql',
+        'ds_gprd_cookie_category.sql',
+        'ds_gprd_cookie_category_lang.sql',
+        'ds_gprd_cookie_in_category.sql',
+        'ds_gprd_cookie_field.sql',
+        'ds_gprd_cookie_field_lang.sql',
+        'ds_gprd_cookie_gui_configuration.sql',
+        'ds_gprd_cookie_gui_configuration_value.sql',
+        'default_data_field.sql',
+        'default_data_field_lang_pl.sql',
+        'default_data_category.sql',
+        'default_data_category_lang.sql'
     ];
 
     private $translator;
