@@ -3,8 +3,17 @@ imports:
 
 services:
     # Form services
-    darkside.module.dsgprd.type.quote:
-        class: 'DarkSide\DsGPRDCookie\Form\CookieType'
+    darkside.module.dsgprd.type.cookie:
+        class: 'DarkSide\DsGprdCookie\Form\CookieType'
+        parent: 'form.type.translatable.aware'
+        public: true
+        arguments:
+            - '@=service("prestashop.adapter.multistore_feature").isUsed()'
+        tags:
+            - { name: form.type }
+
+    darkside.module.dsgprd.type.cookie.field:
+        class: 'DarkSide\DsGprdCookie\Form\CookieFieldType'
         parent: 'form.type.translatable.aware'
         public: true
         arguments:
@@ -13,22 +22,42 @@ services:
             - { name: form.type }
 
     darkside.module.dsgprd.form.identifiable_object.data_provider.cookie_form_data_provider:
-        class: 'DarkSide\DsGPRDCookie\Form\CookieFormDataProvider'
+        class: 'DarkSide\DsGprdCookie\Form\CookieFormDataProvider'
         arguments:
             - '@darkside.module.dsgprd.repository.cookie_repository'
+
+    darkside.module.dsgprd.form.identifiable_object.data_provider.cookie_field_form_data_provider:
+        class: 'DarkSide\DsGprdCookie\Form\CookieFieldFormDataProvider'
+        arguments:
+            - '@darkside.module.dsgprd.repository.cookie_field_repository'
 
     darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder:
         class: 'PrestaShop\PrestaShop\Core\Form\IdentifiableObject\Builder\FormBuilder'
         public: true
         factory: 'prestashop.core.form.builder.form_builder_factory:create'
         arguments:
-            - 'DarkSide\DsGPRDCookie\Form\CookieType'
+            - 'DarkSide\DsGprdCookie\Form\CookieType'
             - '@darkside.module.dsgprd.form.identifiable_object.data_provider.cookie_form_data_provider'
 
+    darkside.module.dsgprd.form.identifiable_object.builder.cookie_field_form_builder:
+        class: 'PrestaShop\PrestaShop\Core\Form\IdentifiableObject\Builder\FormBuilder'
+        public: true
+        factory: 'prestashop.core.form.builder.form_builder_factory:create'
+        arguments:
+            - 'DarkSide\DsGprdCookie\Form\CookieFieldType'
+            - '@darkside.module.dsgprd.form.identifiable_object.data_provider.cookie_field_form_data_provider'
+
     darkside.module.dsgprd.form.identifiable_object.data_handler.cookie_form_data_handler:
-        class: 'DarkSide\DsGPRDCookie\Form\CookieFormDataHandler'
+        class: 'DarkSide\DsGprdCookie\Form\CookieFormDataHandler'
         arguments:
             - '@darkside.module.dsgprd.repository.cookie_repository'
+            - '@darkside.module.dsgprd.repository.cookie_category_repository'
+            - '@doctrine.orm.default_entity_manager'
+
+    darkside.module.dsgprd.form.identifiable_object.data_handler.cookie_field_form_data_handler:
+        class: 'DarkSide\DsGprdCookie\Form\CookieFieldFormDataHandler'
+        arguments:
+            - '@darkside.module.dsgprd.repository.cookie_field_repository'
             - '@prestashop.core.admin.lang.repository'
             - '@doctrine.orm.default_entity_manager'
 
@@ -39,32 +68,74 @@ services:
         arguments:
             - '@darkside.module.dsgprd.form.identifiable_object.data_handler.cookie_form_data_handler'
 
+    darkside.module.dsgprd.form.identifiable_object.handler.cookie_field_form_handler:
+        class: 'PrestaShop\PrestaShop\Core\Form\IdentifiableObject\Handler\FormHandler'
+        public: true
+        factory: 'prestashop.core.form.identifiable_object.handler.form_handler_factory:create'
+        arguments:
+            - '@darkside.module.dsgprd.form.identifiable_object.data_handler.cookie_field_form_data_handler'
+
     # Grid services
     darkside.module.dsgprd.grid.definition.factory.cookies:
-        class: 'DarkSide\DsGPRDCookie\Grid\Definition\Factory\CookieGridDefinitionFactory'
+        class: 'DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory'
+        parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
+    
+    darkside.module.dsgprd.grid.definition.factory.fields:
+        class: 'DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieFieldGridDefinitionFactory'
         parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
 
-    darkside.module.dsgprd.grid.query_builder.quote:
-        class: 'DarkSide\DsGPRDCookie\Grid\Query\CookieQueryBuilder'
+    darkside.module.dsgprd.grid.query_builder.cookie:
+        class: 'DarkSide\DsGprdCookie\Grid\Query\CookieQueryBuilder'
+        parent: 'prestashop.core.grid.abstract_query_builder'
+        public: true
+        arguments:
+            - '@prestashop.core.query.doctrine_search_criteria_applicator'
+            - "@=service('prestashop.adapter.legacy.context').getContext().language.id"
+            - "@=service('prestashop.adapter.legacy.context').getContext().shop.id"
+
+    darkside.module.dsgprd.grid.query_builder.cookie.field:
+        class: 'DarkSide\DsGprdCookie\Grid\Query\CookieFieldQueryBuilder'
         parent: 'prestashop.core.grid.abstract_query_builder'
         public: true
         arguments:
             - '@prestashop.core.query.doctrine_search_criteria_applicator'
             - "@=service('prestashop.adapter.legacy.context').getContext().language.id"
 
-    darkside.module.dsgprd.grid.data_provider.cookies:
+    darkside.module.dsgprd.cookie.grid.data_provider.cookies:
         class: '%prestashop.core.grid.data.factory.doctrine_grid_data_factory%'
         arguments:
-            - '@darkside.module.dsgprd.grid.query_builder.quote'
+            - '@darkside.module.dsgprd.grid.query_builder.cookie'
             - '@prestashop.core.hook.dispatcher'
             - '@prestashop.core.grid.query.doctrine_query_parser'
-            - 'quote'
+            - 'cookie'
+
+    darkside.module.dsgprd.cookie.field.grid.data_provider.cookies:
+        class: '%prestashop.core.grid.data.factory.doctrine_grid_data_factory%'
+        arguments:
+            - '@darkside.module.dsgprd.grid.query_builder.cookie.field'
+            - '@prestashop.core.hook.dispatcher'
+            - '@prestashop.core.grid.query.doctrine_query_parser'
+            - 'cookie'
 
     darkside.module.dsgprd.grid.factory.cookies:
         class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
         public: true
         arguments:
             - '@darkside.module.dsgprd.grid.definition.factory.cookies'
-            - '@darkside.module.dsgprd.grid.data_provider.cookies'
+            - '@darkside.module.dsgprd.cookie.grid.data_provider.cookies'
             - '@prestashop.core.grid.filter.form_factory'
             - '@prestashop.core.hook.dispatcher'
+
+    darkside.module.dsgprd.grid.factory.fields:
+        class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+        public: true
+        arguments:
+            - '@darkside.module.dsgprd.grid.definition.factory.fields'
+            - '@darkside.module.dsgprd.cookie.field.grid.data_provider.cookies'
+            - '@prestashop.core.grid.filter.form_factory'
+            - '@prestashop.core.hook.dispatcher'
+    
+    DarkSidee\DsGprdCookie\Controller\Admin\CookieController:
+        class: DarkSidee\DsGprdCookie\Controller\Admin\CookieController
+        arguments:
+            - '@doctrine.cache.provider'
