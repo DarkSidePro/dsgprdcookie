@@ -20,15 +20,21 @@
 
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Grid\Definition\Factory;
+namespace DarkSide\DsGprdCookie\Grid\Definition\Factory;
 
 use PrestaShop\PrestaShop\Core\Grid\Action\Bulk\BulkActionCollection;
 use PrestaShop\PrestaShop\Core\Grid\Action\Bulk\Type\SubmitBulkAction;
 use PrestaShop\PrestaShop\Core\Grid\Action\GridActionCollection;
+use PrestaShop\PrestaShop\Core\Grid\Action\Row\RowActionCollection;
+use PrestaShop\PrestaShop\Core\Grid\Action\Row\Type\LinkRowAction;
+use PrestaShop\PrestaShop\Core\Grid\Action\Row\Type\SubmitRowAction;
 use PrestaShop\PrestaShop\Core\Grid\Action\Type\SimpleGridAction;
 use PrestaShop\PrestaShop\Core\Grid\Column\ColumnCollection;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\ActionColumn;
+use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\BulkActionColumn;
+use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\ChoiceColumn;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\DataColumn;
+use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\StatusColumn;
 use PrestaShop\PrestaShop\Core\Grid\Definition\Factory\AbstractGridDefinitionFactory;
 use PrestaShop\PrestaShop\Core\Grid\Filter\Filter;
 use PrestaShop\PrestaShop\Core\Grid\Filter\FilterCollection;
@@ -53,7 +59,7 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
      */
     protected function getName()
     {
-        return $this->trans('Cookies', [], 'Modules.DsGPRDCookie.Admin');
+        return $this->trans('Cookies', [], 'Modules.DsGprdCookie.Admin');
     }
 
     /**
@@ -63,6 +69,12 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
     {
         return (new ColumnCollection())
             ->add(
+                (new BulkActionColumn('bulk'))
+                    ->setOptions([
+                        'bulk_field' => 'id',
+                    ])
+            )
+            ->add(
                 (new DataColumn('id'))
                     ->setOptions([
                         'field' => 'id',
@@ -70,28 +82,28 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
             )
             ->add(
                 (new DataColumn('cookie_service'))
-                    ->setName($this->trans('Service name', [], 'Modules.DsGPRDCookie.Admin'))
+                    ->setName($this->trans('Service name', [], 'Modules.DsGprdCookie.Admin'))
                     ->setOptions([
                         'field' => 'cookie_service',
                     ])
             )
             ->add(
-                (new DataColumn('cookie_category'))
-                    ->setName($this->trans('Category', [], 'Modules.DsGPRDCookie.Admin'))
+                (new DataColumn('category_name'))
+                    ->setName($this->trans('Category', [], 'Modules.DsGprdCookie.Admin'))
                     ->setOptions([
-                        'field' => 'cookie_category',
+                        'field' => 'category_name',
                     ])
             )
             ->add(
                 (new DataColumn('cookie_name'))
-                    ->setName($this->trans('Cookie part name', [], 'Modules.DsGPRDCookie.Admin'))
+                    ->setName($this->trans('Cookie part name', [], 'Modules.DsGprdCookie.Admin'))
                     ->setOptions([
                         'field' => 'cookie_name',
                     ])
             )
             ->add(
-                (new DataColumn('enabled'))
-                    ->setName($this->trans('Active', [], 'Modules.DsGPRDCookie.Admin'))
+                (new StatusColumn('enabled'))
+                    ->setName($this->trans('Active', [], 'Modules.DsGprdCookie.Admin'))
                     ->setOptions([
                         'field' => 'enabled',
                     ])
@@ -99,6 +111,33 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
             ->add(
                 (new ActionColumn('actions'))
                     ->setName($this->trans('Actions', [], 'Admin.Actions'))
+                    ->setOptions([
+                        'actions' => (new RowActionCollection())
+                            ->add(
+                                (new LinkRowAction('edit'))
+                                    ->setIcon('edit')
+                                    ->setOptions([
+                                        'route' => 'ds_gprdcookie_cookie_edit',
+                                        'route_param_name' => 'id',
+                                        'route_param_field' => 'id'
+                                    ])
+                            )
+                            ->add(
+                                (new LinkRowAction('delete'))
+                                    ->setName($this->trans('Delete', [], 'Admin.Actions'))
+                                    ->setIcon('delete')
+                                    ->setOptions([
+                                        'route' => 'ds_gprdcookie_cookie_delete',
+                                        'route_param_name' => 'id',
+                                        'route_param_field' => 'id',
+                                        'confirm_message' => $this->trans(
+                                            'Delete selected item?',
+                                            [],
+                                            'Admin.Notifications.Warning'
+                                        ),
+                                    ])
+                            )
+                    ])
             );
     }
 
@@ -114,7 +153,7 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
-                            'placeholder' => $this->trans('ID', [], 'Admin.Global'),
+                            'placeholder' => $this->trans('ID', [], 'Modules.DsGprdCookie.Admin'),
                         ],
                     ])
                     ->setAssociatedColumn('id')
@@ -124,42 +163,42 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
-                            'placeholder' => $this->trans('Service name', [], 'Admin.Global'),
+                            'placeholder' => $this->trans('Service name', [], 'Modules.DsGprdCookie.Admin'),
                         ],
                     ])
                     ->setAssociatedColumn('cookie_service')
             )
             ->add(
-                (new Filter('cookie_category', ChoiceType::class, [
+                (new Filter('category_name', ChoiceType::class, [
                     'choices' => []
                 ]))
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
-                            'placeholder' => $this->trans('Price', [], 'Admin.Global'),
+                            'placeholder' => $this->trans('Cookie category', [], 'Modules.DsGprdCookie.Admin'),
                         ],
                     ])
-                    ->setAssociatedColumn('price_tax_excluded')
+                    ->setAssociatedColumn('category_name')
             )
             ->add(
-                (new Filter('reference', TextType::class))
+                (new Filter('cookie_name', TextType::class))
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
-                            'placeholder' => $this->trans('Reference', [], 'Modules.Demogrid.Admin'),
+                            'placeholder' => $this->trans('Cookie name', [], 'Modules.DsGprdCookie.Admin'),
                         ],
                     ])
-                    ->setAssociatedColumn('reference')
+                    ->setAssociatedColumn('cookie_name')
             )
             ->add(
-                (new Filter('active', TextType::class))
+                (new Filter('enabled', TextType::class))
                     ->setTypeOptions([
                         'required' => false,
                         'attr' => [
-                            'placeholder' => $this->trans('Active', [], 'Modules.Demogrid.Admin'),
+                            'placeholder' => $this->trans('Enabled', [], 'Modules.DsGprdCookie.Admin'),
                         ],
                     ])
-                    ->setAssociatedColumn('active')
+                    ->setAssociatedColumn('enabled')
             )
             ->add(
                 (new Filter('actions', SearchAndResetType::class))
@@ -168,7 +207,7 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
                         'reset_route_params' => [
                             'filterId' => self::GRID_ID,
                         ],
-                        'redirect_route' => 'demo_grid_index',
+                        'redirect_route' => 'ds_gprdcookie_cookie_index',
                     ])
                     ->setAssociatedColumn('actions')
             )
@@ -205,7 +244,7 @@ class CookieGridDefinitionFactory extends AbstractGridDefinitionFactory
             ->add((new SubmitBulkAction('delete_bulk'))
                 ->setName($this->trans('Delete selected', [], 'Admin.Actions'))
                 ->setOptions([
-                    'submit_route' => 'ps_demodoctrine_quote_bulk_delete',
+                    'submit_route' => 'ds_gprdcookie_cookie_bulk_delete',
                     'confirm_message' => $this->trans('Delete selected items?', [], 'Admin.Notifications.Warning'),
                 ])
             )

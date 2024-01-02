@@ -9,10 +9,10 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Form;
+namespace DarkSide\DsGprdCookie\Form;
 
 use Context;
-use DarkSide\DsGPRDCookie\Repository\CookieRepository;
+use DarkSide\DsGprdCookie\Repository\CookieRepository;
 use PrestaShop\PrestaShop\Core\Form\IdentifiableObject\DataProvider\FormDataProviderInterface;
 
 class CookieFormDataProvider implements FormDataProviderInterface
@@ -40,13 +40,23 @@ class CookieFormDataProvider implements FormDataProviderInterface
         $cookieData = [
             'id_shop' => $cookie->getIdShop(),
             'cookie_service' => $cookie->getCookieService(),
-            'cookie_category' => $cookie->getCookieCategory(),
             'cookie_name' => $cookie->getCookieName(),
-            'enabled' => $cookie->isEnabled()
+            'enabled' => $cookie->isEnabled(),
+            'script' => $cookie->getScript(),
+            'extra_script' => $cookie->getExtraScript(),
+            'position' => $cookie->getPosition()
         ];
 
         foreach ($cookie->getLangs() as $cookieLang) {
-            $cookieData['text_value'][$cookieLang->getLang()] = $cookieLang->getTextValue();
+            $cookieData['text_value'][$cookieLang->getIdLang()] = $cookieLang->getTextValue();
+        }
+
+        $cookieInCategory = $cookie->getCookieInCategories();
+        
+        foreach ($cookieInCategory as $item) {
+            $categoryLangs = $item->getCategory()->getId();
+
+            $cookieData['category_name'] = $categoryLangs;
         }
 
         return $cookieData;
@@ -64,6 +74,9 @@ class CookieFormDataProvider implements FormDataProviderInterface
             'cookie_name' => '',
             'enabled' => false,
             'text_value' => [],
+            'script' => '',
+            'extra_script' => '',
+            'position' => 'header'
         ];
     }
 }

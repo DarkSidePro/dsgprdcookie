@@ -22,12 +22,12 @@ declare(strict_types=1);
 
 namespace  DarkSide\DsGprdCookie\Grid\Filters;
 
-use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory;
+use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieFieldGridDefinitionFactory;
 use PrestaShop\PrestaShop\Core\Search\Filters;
 
-class CookieFilters extends Filters
+class CookieFieldFilters extends Filters
 {
-    protected $filterId = CookieGridDefinitionFactory::GRID_ID;
+    protected $filterId = CookieFieldGridDefinitionFactory::GRID_ID;
 
     /**
      * {@inheritdoc}
