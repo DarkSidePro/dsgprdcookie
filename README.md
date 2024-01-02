@@ -7,8 +7,8 @@
 
 
 ### Menu:
-#### - [English](#h3-description- "English")
-#### - [Polski](#h3-opis- "Polski")
+#### - [English](https://github.com/DarkSidePro/dsgprdcookie/tree/master?tab=readme-ov-file#description)
+#### - [Polski](https://github.com/DarkSidePro/dsgprdcookie/tree/master?tab=readme-ov-file#opis)
 
 ---
 
