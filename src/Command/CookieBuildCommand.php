@@ -1,4 +1,4 @@
-<?
+<?php 
 namespace DarkSide\DsGprdCookie\Command;
 
 use Symfony\Component\Console\Command\Command;
