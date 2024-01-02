@@ -1,13 +1,27 @@
 services:
     darkside.module.dsgprd.repository.cookie_repository:
-        class: DarkSide\DsGPRDCookie\Repository\CookieRepository
+        class: DarkSide\DsGprdCookie\Repository\CookieRepository
         public: true
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
-            - DarkSide\DsGPRDCookie\Entity\Cookie
+            - DarkSide\DsGprdCookie\Entity\DsGprdCookie
+
+    darkside.module.dsgprd.repository.cookie_field_repository:
+        class: DarkSide\DsGprdCookie\Repository\CookieFieldRepository
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - DarkSide\DsGprdCookie\Entity\DsGprdCookieField
+
+    darkside.module.dsgprd.repository.cookie_category_repository:
+        class: DarkSide\DsGprdCookie\Repository\CookieCategoryRepository
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - DarkSide\DsGprdCookie\Entity\DsGprdCookieCategory
 
     darkside.module.dsgprd.cookies.install:
-        class: DarkSide\DsGPRDCookie\Database\CookieInstaller
+        class: DarkSide\DsGprdCookie\Database\CookieInstaller
         arguments:
             - '@doctrine.dbal.default_connection'
             - '%database_prefix%'
