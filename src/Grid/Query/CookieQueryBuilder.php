@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Grid\Query;
+namespace DarkSide\DsGprdCookie\Grid\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -67,6 +67,7 @@ class CookieQueryBuilder extends AbstractDoctrineQueryBuilder
             ->groupBy('c.id')
             ->where('c.id_shop = :id_shop')
             ->setParameter(':id_shop', $this->id_shop);
+        
 
         $this->searchCriteriaApplicator
             ->applySorting($searchCriteria, $qb)
@@ -107,9 +108,10 @@ class CookieQueryBuilder extends AbstractDoctrineQueryBuilder
         $qb = $this->connection
             ->createQueryBuilder()
             ->from($this->dbPrefix . 'ds_gprd_cookie', 'c')
-            ->innerJoin('c', $this->dbPrefix . 'ds_gprd_cookie_lang', 'cl', 'c.id = cl.cookie AND cl.id_lang = :language')
-            ->leftJoin('c', Join::ON, 'cc', 'c.id = cc.cookie_category')
-            ->leftJoin('c', Join::ON, 'ccl', 'cc.id = ccl.category AND ccl.id_lang = :language')
+            ->innerJoin('c', $this->dbPrefix . 'ds_gprd_cookie_lang', 'cl', 'c.id = cl.cookie_id AND cl.id_lang = :language')
+            ->innerJoin('c', $this->dbPrefix . 'ds_gprd_cookie_in_category', 'cic', 'c.id = cic.cookie_id')
+            ->leftJoin('cic', $this->dbPrefix . 'ds_gprd_cookie_category', 'cc', 'cic.category_id = cc.id')
+            ->leftJoin('cc', $this->dbPrefix . 'ds_gprd_cookie_category_lang', 'ccl', 'cc.id = ccl.category_id AND ccl.id_lang = :language')
             ->setParameter('language', $this->languageId)
         ;
 
@@ -128,6 +130,8 @@ class CookieQueryBuilder extends AbstractDoctrineQueryBuilder
             $qb->andWhere("$name LIKE :$name");
             $qb->setParameter($name, '%' . $value . '%');
         }
+
+        $qb->orderBy('c.id');
 
         return $qb;
     }
