@@ -49,7 +49,7 @@ class Dsgprdcookie extends Module
     private function createTab()
     {
         $container = SymfonyContainer::getInstance();
-        $tabRepository = $container->get('prestashop.core.tab.repository');
+        $tabRepository = $container->get('prestashop.core.admin.tab.repository');
 
         $response = true;
         $parentTabID = $tabRepository->findOneIdByClassName('AdminDarkSideMenu');
@@ -106,7 +106,7 @@ class Dsgprdcookie extends Module
     private function tabRem()
     {
         $container = SymfonyContainer::getInstance();
-        $tabRepository = $container->get('prestashop.core.tab.repository');
+        $tabRepository = $container->get('prestashop.core.admin.tab.repository');
 
         $id_tab = $tabRepository->findOneByClassName('CookieBa');
         if ($id_tab) {
