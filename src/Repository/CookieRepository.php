@@ -9,12 +9,23 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Repository;
+namespace DarkSide\DsGprdCookie\Repository;
 
+use DarkSide\DsGprdCookie\Entity\DsGprdCookie;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 class CookieRepository extends EntityRepository
 {
-
+    public function findAllActiveCookiesByShopId(int $id_shop)
+    {
+        return $this->createQueryBuilder('c')
+            ->from(DsGprdCookie::class, 'c')
+            ->where('c.enabled = :enabled')
+            ->andWhere('c.id_shop = :id_shop')
+            ->setParameter(':enbaled', true)
+            ->setParameter(':id_shop', $id_shop)
+            ->getQuery()
+            ->getResult();
+    }
 }
