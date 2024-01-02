@@ -1,0 +1,41 @@
+{#**
+ * 2007-2020 PrestaShop SA and Contributors
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License 3.0 (AFL-3.0).
+ * It is also available through the world-wide-web at this URL: https://opensource.org/licenses/AFL-3.0
+ *#}
+
+{% extends '@!PrestaShop/Admin/layout.html.twig' %}
+{# Since PS 8.0.0 you can use @PrestaShopCore instead of @!Prestashop
+(https://devdocs.prestashop-project.org/8/modules/concepts/templating/admin-views/#override-templates) #}
+
+{% block content %}
+    {% block quotes_list_panel %}
+        <div class="row">
+            <div class="col">
+                {% include '@PrestaShop/Admin/Common/Grid/grid_panel.html.twig' with {'grid': ds_cookie} %}
+            </div>
+        </div>
+    {% endblock %}
+{% endblock %}
+
+{% block javascripts %} 
+    {{ parent() }}
+    <script>
+        const gridId = "ds_cookie";
+        const grid = new window.prestashop.component.Grid(gridId);
+        grid.addExtension(new window.prestashop.component.GridExtensions.ColumnTogglingExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.ExportToSqlManagerExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.FiltersResetExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.SubmitBulkActionExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.SubmitGridActionExtension());	
+        grid.addExtension(new window.prestashop.component.GridExtensions.SubmitRowActionExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.ReloadListExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.SortingExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.LinkRowActionExtension());
+        grid.addExtension(new window.prestashop.component.GridExtensions.ColumnTogglingExtension());
+    </script>
+    <script src="{{ asset('themes/default/js/bundle/pagination.js') }}"></script>
+{% endblock %}
