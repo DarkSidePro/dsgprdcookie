@@ -13,12 +13,26 @@ services:
         arguments:
             - DarkSide\DsGprdCookie\Entity\DsGprdCookieField
 
+    darkside.module.dsgprd.repository.cookie_field_lang_repository:
+        class: DarkSide\DsGprdCookie\Repository\CookieFieldLangRepository
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - DarkSide\DsGprdCookie\Entity\DsGprdCookieFieldLang
+
     darkside.module.dsgprd.repository.cookie_category_repository:
         class: DarkSide\DsGprdCookie\Repository\CookieCategoryRepository
         public: true
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - DarkSide\DsGprdCookie\Entity\DsGprdCookieCategory
+
+    darkside.module.dsgprd.repository.cookie_category_lang_repository:
+        class: DarkSide\DsGprdCookie\Repository\CookieCategoryLangRepository
+        public: true
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - DarkSide\DsGprdCookie\Entity\DsGprdCookieLangCategory
 
     darkside.module.dsgprd.cookies.install:
         class: DarkSide\DsGprdCookie\Database\CookieInstaller
