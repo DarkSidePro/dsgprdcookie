@@ -9,13 +9,14 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Form;
+namespace DarkSide\DsGprdCookie\Form;
 
 use Context;
-use DarkSide\DsGPRDCookie\Entity\DsGPRDCookie;
-use DarkSide\DsGPRDCookie\Entity\DsGPRDCookieLang;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookie;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookieInCategory;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookieLang;
 use Doctrine\ORM\EntityManagerInterface;
-use DarkSide\DsGPRDCookie\Repository\CookieRepository;
+use DarkSide\DsGprdCookie\Repository\CookieRepository;
 use PrestaShop\PrestaShop\Core\Form\IdentifiableObject\DataHandler\FormDataHandlerInterface;
 
 class CookieFieldFormDataHandler implements FormDataHandlerInterface
@@ -53,22 +54,33 @@ class CookieFieldFormDataHandler implements FormDataHandlerInterface
             return false;
         }
 
-        $cookie = new DsGPRDCookie;
+        $cookie = new DsGprdCookie;
         $cookie->setIdShop($data['id_shop']);
         $cookie->setEnabled($data['enabled']);
         $cookie->setCookieName($data['cookie_name']);
         $cookie->setCookieService($data['cookie_service']);
 
+        $this->entityManager->persist($cookie);
+        
+        $cookieInCategory = new DsGprdCookieInCategory;
+        $cookieInCategory->setCookie($cookie);
+        $cookieInCategory->setCategory($data['cookie_category']);
+
+        $this->entityManager->persist($cookieInCategory);
+
         foreach ($data['text_value'] as $langId => $langContent) {
-            $cookieLang = new DsGPRDCookieLang();
+            $cookieLang = new DsGprdCookieLang();
             $cookieLang
                 ->setIdLang($langId)
                 ->setTextValue($langContent)                
             ;
 
-            $cookie->addLang($cookieLang);
+            $cookieLang->setCookie($cookie);
+
+            $this->entityManager->persist($cookieLang);
+
         }
-        $this->entityManager->persist($cookie);
+        
         $this->entityManager->flush();
 
         return $cookie->getId();
@@ -99,9 +111,9 @@ class CookieFieldFormDataHandler implements FormDataHandlerInterface
     }
 
     /**
-     * @param DsGPRDCookie $dsGPRDCookie
+     * @param DsGprdCookie $dsGPRDCookie
      */
-    public function delete(DsGPRDCookie $dsGPRDCookie)
+    public function delete(DsGprdCookie $dsGPRDCookie)
     {
         $langs = $dsGPRDCookie->getLangs();
 

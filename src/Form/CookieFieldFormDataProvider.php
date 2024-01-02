@@ -9,10 +9,10 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Form;
+namespace DarkSide\DsGprdCookie\Form;
 
 use Context;
-use DarkSide\DsGPRDCookie\Repository\CookieRepository;
+use DarkSide\DsGprdCookie\Repository\CookieRepository;
 use PrestaShop\PrestaShop\Core\Form\IdentifiableObject\DataProvider\FormDataProviderInterface;
 
 class CookieFieldFormDataProvider implements FormDataProviderInterface

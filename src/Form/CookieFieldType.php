@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace DarkSide\DsGPRDCookie\Form;
+namespace DarkSide\DsGprdCookie\Form;
 
 use PrestaShop\PrestaShop\Core\ConstraintValidator\Constraints\DefaultLanguage;
 use PrestaShopBundle\Form\Admin\Type\TranslatableType;
