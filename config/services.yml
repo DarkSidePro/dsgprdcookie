@@ -138,8 +138,6 @@ services:
     darkside.module.dsgprd.controller.admin.cookie_controller:
         class: DarkSide\DsGprdCookie\Controller\Admin\CookieController
         arguments:
-            $doctrineCache: '@doctrine.cache.provider'
-            $kernel: '@kernel'
         tags:
             - { name: 'controller.service_arguments' }
 
