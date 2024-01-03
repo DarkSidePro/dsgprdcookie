@@ -48,8 +48,7 @@ class Dsgprdcookie extends Module
 
     private function createTab()
     {
-        $container = SymfonyContainer::getInstance();
-        $tabRepository = $container->get('prestashop.core.admin.tab.repository');
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
 
         $response = true;
         $parentTabID = $tabRepository->findOneIdByClassName('AdminDarkSideMenu');
@@ -105,8 +104,7 @@ class Dsgprdcookie extends Module
 
     private function tabRem()
     {
-        $container = SymfonyContainer::getInstance();
-        $tabRepository = $container->get('prestashop.core.admin.tab.repository');
+        $tabRepository = $this->get('prestashop.core.admin.tab.repository');
 
         $id_tab = $tabRepository->findOneByClassName('CookieBa');
         if ($id_tab) {
@@ -175,16 +173,14 @@ class Dsgprdcookie extends Module
      */
     public function hookHeader()
     {
-        $this->context->controller->addJS($this->_path.'/views/js/build.js');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
     public function hookDisplayBeforeBodyClosingTag()
     {
         $shop_id = Context::getContext()->shop->id;
-        $container = SymfonyContainer::getInstance();
+        $cookieRepository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
 
-        $cookieRepository = $container->get('darkside.module.dsgprd.repository.cookie_repository');
         $cookies = $cookieRepository->findAllActiveCookiesByShopId($shop_id);
 
         $this->smarty->assign('cookies', $cookies);
