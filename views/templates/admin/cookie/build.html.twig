@@ -39,7 +39,7 @@ CookieConsent.run({
                 autoClear: {
                     cookies: [{
                         {% for cookie in cookies %}
-                            name: {% if cookie.cookie_name|match(regexPattern) %} {{cookie.cookie_name}} {% else %} '{{cookie.cookie_name}}' {% endif %}
+                            name: {% if cookie.cookie_name matches regexPattern %} {{cookie.cookie_name}} {% else %} '{{cookie.cookie_name}}' {% endif %}
                         {% endfor %}
                     }]
                 },
@@ -86,11 +86,11 @@ CookieConsent.run({
                             linkedCategory: {{category.type}},
                             description: {{ category.text_value }},
                             cookieTable: {
-                                caption: {{ field['preferencesModal_serviceCounterLabel_sections_cookieTable_caption']['text_value']}},
+                                caption: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_caption']['text_value']}},
                                 headers: {
-                                    name: {{ field['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_name']['text_value']}},
-                                    domain: {{ field['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_domain']['text_value']}},
-                                    desc: {{ field['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_desc']['text_value']}}
+                                    name: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_name']['text_value']}},
+                                    domain: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_domain']['text_value']}},
+                                    desc: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_desc']['text_value']}}
                                 },
                                 body: [{
                                     {% for cookie in cookies %}
