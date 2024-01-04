@@ -1,5 +1,3 @@
-{% set regexPattern = "/\d+/" %}
-
 CookieConsent.run({
 
     // root: 'body',
@@ -32,25 +30,27 @@ CookieConsent.run({
     },
 
     categories: {
-        {% for category in categories%}
+        {% for category in categories %}
             {{ category.type }}: {
                 enabled: {{ category.default_enabled }},
                 readOnly: {{ category.readonly }},
                 autoClear: {
                     cookies: [{
                         {% for cookie in cookies %}
-                            name: {% if cookie.cookie_name matches regexPattern %} {{cookie.cookie_name}} {% else %} '{{cookie.cookie_name}}' {% endif %}
+                            {% if cookie.category_id is same as category.id %}
+                                name: "{{ cookie.cookie_name }}"
+                            {% endif %}
                         {% endfor %}
                     }]
                 },
                 services: {
                     {% for cookie in cookies %}
                         {{ cookie.id }}: {
-                            label: {{ cookie.cookie_service }}
+                            label: "{{ cookie.cookie_service }}"{% if loop.last is not true %},{% endif %}                                
                         }
                     {% endfor %}
                 }
-            }
+            }{% if loop.last is not true %},{% endif %}
         {% endfor %}
     },
 
@@ -60,44 +60,44 @@ CookieConsent.run({
         translations: {
             pl: {
                 consentModal: {
-                    title: {{ fields['consentModal_title']['text_value'] }},
-                    description: {{ fields['consentModal_description']['text_value'] }},
-                    acceptAllBtn: {{ fields['consentModal_acceptAllBtn']['text_value'] }},
-                    acceptNecessaryBtn: {{ fields['consentModal_acceptNecessaryBtn']['text_value'] }},
-                    showPreferencesBtn: {{ fields['consentModal_showPreferencesBtn']['text_value'] }},
+                    title: "{{ fields['consentModal_title']['text_value'] }}",
+                    description: "{{ fields['consentModal_description']['text_value'] }}",
+                    acceptAllBtn: "{{ fields['consentModal_acceptAllBtn']['text_value'] }}",
+                    acceptNecessaryBtn: "{{ fields['consentModal_acceptNecessaryBtn']['text_value'] }}",
+                    showPreferencesBtn: "{{ fields['consentModal_showPreferencesBtn']['text_value'] }}",
                     footer: `
                         <a href="#path-to-impressum.html" target="_blank">Impressum</a>
                         <a href="#path-to-privacy-policy.html" target="_blank">Privacy Policy</a>
                     `,
                 },
                 preferencesModal: {
-                    title: {{ fields['preferencesModal_title']['text_value'] }},
-                    acceptAllBtn: {{ fields['preferencesModal_acceptAllBtn']['text_value'] }},
-                    acceptNecessaryBtn: {{ fields['preferencesModal_acceptNecessaryBtn']['text_value'] }},
-                    savePreferencesBtn: {{ fields['preferencesModal_savePreferencesBtn']['text_value'] }},
-                    closeIconLabel: {{ fields['preferencesModal_closeIconLabel']['text_value'] }},
-                    serviceCounterLabel: {{ fields['preferencesModal_serviceCounterLabel']['text_value'] }},
+                    title: "{{ fields['preferencesModal_title']['text_value'] }}",
+                    acceptAllBtn: "{{ fields['preferencesModal_acceptAllBtn']['text_value'] }}",
+                    acceptNecessaryBtn: "{{ fields['preferencesModal_acceptNecessaryBtn']['text_value'] }}",
+                    savePreferencesBtn: "{{ fields['preferencesModal_savePreferencesBtn']['text_value'] }}",
+                    closeIconLabel: "{{ fields['preferencesModal_closeIconLabel']['text_value'] }}",
+                    serviceCounterLabel: "{{ fields['preferencesModal_serviceCounterLabel']['text_value'] }}",
                     sections: [{
-                            title: {{ fields['preferencesModal_serviceCounterLabel_sections_title']['text_value'] }},
-                            description: {{ fields['preferencesModal_serviceCounterLabel_sections_description']['text_value'] }},
+                            title: "{{ fields['preferencesModal_serviceCounterLabel_sections_title']['text_value'] }}",
+                            description: "{{ fields['preferencesModal_serviceCounterLabel_sections_description']['text_value'] }}",
                         },
                         {% for category in categories %}
-                            title: {{ category.category_name}},
-                            linkedCategory: {{category.type}},
-                            description: {{ category.text_value }},
+                            title: "{{ category.category_name}}",
+                            linkedCategory: "{{ category.type }}",
+                            description: "{{ category.text_value }}",
                             cookieTable: {
-                                caption: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_caption']['text_value']}},
+                                caption: "{{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_caption']['text_value']}}",
                                 headers: {
-                                    name: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_name']['text_value']}},
-                                    domain: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_domain']['text_value']}},
-                                    desc: {{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_desc']['text_value']}}
+                                    name: "{{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_name']['text_value']}}",
+                                    domain: "{{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_domain']['text_value']}}",
+                                    desc: "{{ fields['preferencesModal_serviceCounterLabel_sections_cookieTable_headers_desc']['text_value']}}"
                                 },
                                 body: [{
                                     {% for cookie in cookies %}
-                                        name: {{ cookie.cookie_name}},
+                                        name: "{{ cookie.cookie_name}}",
                                         domain: location.hostname,
-                                        desc: {{ cookie.text_value}}, 
-                                    {% endfor %},
+                                        desc: "{{ cookie.text_value}}", 
+                                    {% endfor %}{% if loop.last is not true %},{% endif %}
                                 }]
                             }
                             
