@@ -25,3 +25,6 @@
 
   <script src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0-rc.17/dist/cookieconsent.umd.js"></script>
   
+  {foreach from=$cookies item=cookie}
+      {$cookie|var_dump}
+  {/foreach}
