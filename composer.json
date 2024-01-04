@@ -21,5 +21,8 @@
     },
     "require-dev": {
         "symfony/var-dumper": "^4.4"
+    },
+    "require": {
+        "tedivm/jshrink": "^1.7"
     }
 }
