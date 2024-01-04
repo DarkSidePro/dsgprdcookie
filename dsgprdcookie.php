@@ -178,10 +178,14 @@ class Dsgprdcookie extends Module
 
     public function hookDisplayBeforeBodyClosingTag()
     {
-        $shop_id = Context::getContext()->shop->id;
+        $shop_id = (int) Context::getContext()->shop->id;
+        $id_lang = (int) Context::getContext()->language->id;
         $cookieRepository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
 
-        $cookies = $cookieRepository->findAllActiveCookiesByShopId($shop_id);
+
+        //dd($cookieRepository->findAllActiveCookiesByShopId($shop_id));
+
+        $cookies = $cookieRepository->findAllActiveCookiesByShopId($shop_id, $id_lang);
 
         $this->smarty->assign('cookies', $cookies);
 
