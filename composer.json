@@ -18,5 +18,8 @@
             "prepend-autoloader": false
         },
         "type": "prestashop-module"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.4"
     }
 }
