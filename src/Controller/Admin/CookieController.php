@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use DarkSide\DsGprdCookie\Exception\WrongCommandOutputException;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory;
+use JShrink\Minifier;
 
 class CookieController extends FrameworkBundleAdminController
 {
@@ -260,6 +261,8 @@ class CookieController extends FrameworkBundleAdminController
     {
         $data = $this->buildAction()->getContent();
 
-        file_put_contents('../modules/dsgprdcookie/views/js/bulit/bulit.js', $data);
+        $minifiedCode = Minifier::minify($data);
+
+        file_put_contents('../modules/dsgprdcookie/views/js/bulit/bulit.js', $minifiedCode);
     }
 }
