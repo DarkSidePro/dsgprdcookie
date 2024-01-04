@@ -12,20 +12,32 @@ declare(strict_types=1);
 namespace DarkSide\DsGprdCookie\Repository;
 
 use DarkSide\DsGprdCookie\Entity\DsGprdCookie;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookieLang;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
 
 class CookieRepository extends EntityRepository
-{
-    public function findAllActiveCookiesByShopId(int $id_shop)
+{   
+    /**
+     * @param int $id_shop
+     * @param int $id_lang
+     * 
+     * @return array
+     */
+    public function findAllActiveCookiesByShopId(int $id_shop, int $id_lang): array
     {
         return $this->createQueryBuilder('c')
-            ->from(DsGprdCookie::class, 'c')
+            ->select('c.cookie_service', 'c.cookie_name', 'c.enabled', 'c.script', 'c.extra_script', 'c.id')
+            ->addSelect('cl.text_value')
+            ->leftJoin(DsGprdCookieLang::class, 'cl', Join::WITH, 'c.id = cl.cookie')
             ->where('c.enabled = :enabled')
             ->andWhere('c.id_shop = :id_shop')
-            ->setParameter(':enbaled', true)
+            ->andWhere('cl.id_lang = :id_lang')
+            ->setParameter(':enabled', true)
             ->setParameter(':id_shop', $id_shop)
+            ->setParameter(':id_lang', $id_lang)
             ->getQuery()
-            ->getResult();
+            ->getResult(Query::HYDRATE_ARRAY);
     }
 }
