@@ -27,6 +27,7 @@ use DarkSide\DsGprdCookie\Exception\WrongCommandOutputException;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory;
 use JShrink\Minifier;
+use Symfony\Component\Filesystem\Filesystem;
 
 class CookieController extends FrameworkBundleAdminController
 {
@@ -127,9 +128,11 @@ class CookieController extends FrameworkBundleAdminController
         $result = $cookieFormHandler->handleFor((int) $id, $cookieForm);
 
         if ($result->isSubmitted() && $result->isValid()) {
+
+            $this->makeBuild();
+
             $this->addFlash('success', $this->trans('Successful update.', 'Admin.Notifications.Success'));
 
-            $this->buildAction();
 
             return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
@@ -246,7 +249,7 @@ class CookieController extends FrameworkBundleAdminController
         $cookies = $cookieRepository->findAllActiveCookiesByShopId($id_shop, $id_lang);
         $fields = $cookieFieldLangRepository->findFieldLangByIdLang($id_lang);
         $categories = $cookieCategoryLangRepository->findCategoriesByLangId($id_lang);
-        
+
         return $this->render('@Modules/dsgprdcookie/views/templates/admin/cookie/build.html.twig', [
             'cookies' => $cookies,
             'fields' => $fields,
@@ -261,8 +264,8 @@ class CookieController extends FrameworkBundleAdminController
     {
         $data = $this->buildAction()->getContent();
 
-        $minifiedCode = Minifier::minify($data);
 
-        file_put_contents('../modules/dsgprdcookie/views/js/bulit/bulit.js', $minifiedCode);
+        $fileSystem = new Filesystem();
+        return $fileSystem->dumpFile('../modules/dsgprdcookie/views/js/bulit/bulit.js', $data);
     }
 }
