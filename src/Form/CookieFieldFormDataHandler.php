@@ -95,6 +95,12 @@ class CookieFieldFormDataHandler implements FormDataHandlerInterface
         $cookie->setEnabled($data['enabled']);
         $cookie->setCookieName($data['cookie_name']);
         $cookie->setCookieService($data['cookie_service']);
+
+        $cics = $cookie->getCookieInCategories();
+
+        foreach ($cics as $cic) {
+            $cic->setCategory($data['cookie_category']);
+        }
         
         foreach ($data['text_value'] as $langId => $content) {
             $cookieLang = $cookie->getCookieLangByLangId($langId);
