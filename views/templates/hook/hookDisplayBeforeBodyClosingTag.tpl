@@ -24,7 +24,9 @@
   *}
 
   <script src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v3.0.0-rc.17/dist/cookieconsent.umd.js"></script>
+  <script src="{$smarty.server.REQUEST_SCHEME}://{$smarty.server.SERVER_NAME}/modules/dsgprdcookie/views/js/bulit/bulit.js"></script>
   
   {foreach from=$cookies item=cookie}
-      {$cookie|var_dump}
+      {$cookie.script nofilter}
+      {$cookie.extra_script nofilter}
   {/foreach}
