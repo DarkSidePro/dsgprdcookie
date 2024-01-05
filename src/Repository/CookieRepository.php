@@ -34,15 +34,16 @@ class CookieRepository extends EntityRepository
             ->addSelect('cl.text_value')
             ->addSelect('cc.id as category_id')
             ->leftJoin(DsGprdCookieLang::class, 'cl', Join::WITH, 'c.id = cl.cookie')
-            ->leftJoin(DsGprdCookieInCategory::class, 'cic', 'c.id = cic.cookie')
-            ->leftJoin(DsGprdCookieCategory::class, 'cc', 'cic.category = cc.id')
+            ->leftJoin(DsGprdCookieInCategory::class, 'cic', Join::WITH, 'c.id = cic.cookie')
+            ->leftJoin(DsGprdCookieCategory::class, 'cc', Join::WITH, 'cic.category = cc.id')
             ->where('c.enabled = :enabled')
             ->andWhere('c.id_shop = :id_shop')
             ->andWhere('cl.id_lang = :id_lang')
             ->setParameter(':enabled', true)
             ->setParameter(':id_shop', $id_shop)
             ->setParameter(':id_lang', $id_lang)
-            ->getQuery()
+            ->groupBy('c.id')
+            ->getQuery()            
             ->getResult(Query::HYDRATE_ARRAY);
     }
 }
