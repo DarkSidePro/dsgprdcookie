@@ -12,20 +12,22 @@ declare(strict_types=1);
 namespace DarkSide\DsGprdCookie\Controller\Admin;
 
 use Context;
-use DarkSide\DsGprdCookie\Exception\WrongCommandOutputException;
-use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
-use DarkSide\DsGprdCookie\Grid\Filters\CookieFilters;
-use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
-use PrestaShopBundle\Service\Grid\ResponseBuilder;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use PrestaShopBundle\Service\Grid\ResponseBuilder;
+use Symfony\Component\Console\Output\BufferedOutput;
+use DarkSide\DsGprdCookie\Grid\Filters\CookieFilters;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use DarkSide\DsGprdCookie\Exception\WrongCommandOutputException;
+use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use DarkSide\DsGprdCookie\Grid\Definition\Factory\CookieGridDefinitionFactory;
+use JShrink\Minifier;
+use Symfony\Component\Filesystem\Filesystem;
 
 class CookieController extends FrameworkBundleAdminController
 {
@@ -76,10 +78,12 @@ class CookieController extends FrameworkBundleAdminController
      * Create cookie
      *
      * @param Request $request
+     * @see KernelInterface
+     * @throws WrongCommandOutputException
      *
      * @return Response
      */
-    public function createAction(Request $request, KernelInterface $kernel)
+    public function createAction(Request $request)
     {
         $cookieFormBuilder = $this->get('darkside.module.dsgprd.form.identifiable_object.builder.cookie_form_builder');
         $cookieForm = $cookieFormBuilder->getForm();
@@ -89,26 +93,14 @@ class CookieController extends FrameworkBundleAdminController
         $result = $cookieFormHandler->handle($cookieForm);
 
         if (null !== $result->getIdentifiableObjectId()) {
+
+            $this->makeBuild();
+            
+
             $this->addFlash(
                 'success',
                 $this->trans('Successful creation.', 'Admin.Notifications.Success')
             );
-
-            try {
-                $application = new Application($kernel);
-                $input = new ArrayInput([
-                    'command' => 'dsgprd:build'
-                ]);
-    
-                $output = new BufferedOutput();
-    
-                $application->run($input, $output);
-    
-                $commpandOutput = $output->fetch();
-
-            } catch (\Exception $e) {
-                throw new WrongCommandOutputException;
-            }
 
             return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
@@ -136,7 +128,11 @@ class CookieController extends FrameworkBundleAdminController
         $result = $cookieFormHandler->handleFor((int) $id, $cookieForm);
 
         if ($result->isSubmitted() && $result->isValid()) {
+
+            $this->makeBuild();
+
             $this->addFlash('success', $this->trans('Successful update.', 'Admin.Notifications.Success'));
+
 
             return $this->redirectToRoute('ds_gprdcookie_cookie_index');
         }
@@ -183,6 +179,8 @@ class CookieController extends FrameworkBundleAdminController
                 )
             );
         }
+
+        $this->makeBuild();
 
         return $this->redirectToRoute('ds_gprdcookie_cookie_index');
     }
@@ -242,21 +240,32 @@ class CookieController extends FrameworkBundleAdminController
     public function buildAction(): Response
     {
         $cookieRepository = $this->get('darkside.module.dsgprd.repository.cookie_repository');
-        $cookieFieldLangRepository = $this->get('darkside.module.dsgprd.repository.cookie_field__lang_repository');
+        $cookieFieldLangRepository = $this->get('darkside.module.dsgprd.repository.cookie_field_lang_repository');
         $cookieCategoryLangRepository = $this->get('darkside.module.dsgprd.repository.cookie_category_lang_repository');
 
         $id_shop = (int) Context::getContext()->shop->id;
         $id_lang = (int) Context::getContext()->language->id;
 
-        $cookies = $cookieRepository->findAllActiveCookiesByShopId($id_shop);
+        $cookies = $cookieRepository->findAllActiveCookiesByShopId($id_shop, $id_lang);
         $fields = $cookieFieldLangRepository->findFieldLangByIdLang($id_lang);
         $categories = $cookieCategoryLangRepository->findCategoriesByLangId($id_lang);
-        
 
         return $this->render('@Modules/dsgprdcookie/views/templates/admin/cookie/build.html.twig', [
             'cookies' => $cookies,
             'fields' => $fields,
             'categories' => $categories
         ]);
+    }
+
+    /**
+     * @see buildAction()     
+     */
+    private function makeBuild(): void
+    {
+        $data = $this->buildAction()->getContent();
+
+
+        $fileSystem = new Filesystem();
+        return $fileSystem->dumpFile('../modules/dsgprdcookie/views/js/bulit/bulit.js', $data);
     }
 }

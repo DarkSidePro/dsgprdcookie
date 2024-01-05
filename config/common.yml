@@ -32,7 +32,7 @@ services:
         public: true
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
-            - DarkSide\DsGprdCookie\Entity\DsGprdCookieLangCategory
+            - DarkSide\DsGprdCookie\Entity\DsGprdCookieCategoryLang
 
     darkside.module.dsgprd.cookies.install:
         class: DarkSide\DsGprdCookie\Database\CookieInstaller

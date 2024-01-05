@@ -27,11 +27,16 @@ class CookieCategoryLangRepository extends EntityRepository
      */
     public function findCategoriesByLangId(int $id_lang): array
     {
-        $categories = $this->createQueryBuilder('c')
-            ->select('ccl.category', 'cc.readonly', 'cc.default_nabled', 'cc.type', 'ccl.text_value', 'ccl.category_name')
-            ->from(DsGprdCookieCategoryLang::class, 'ccl')
-            ->leftJoin(DsGprdCookieCategory::class, 'cc', Join::ON, 'ccl.category = cc.id')
+        $categories = $this->createQueryBuilder('ccl')
+            ->select('cc.id')
+            ->addSelect('cc.readonly')
+            ->addSelect('cc.default_enabled')
+            ->addSelect('cc.type')
+            ->addSelect('ccl.text_value')
+            ->addSelect('ccl.category_name')
+            ->leftJoin(DsGprdCookieCategory::class, 'cc', Join::WITH, 'ccl.category = cc.id')
             ->where('ccl.id_lang = :id_lang')
+            ->setParameter(':id_lang', $id_lang)
             ->getQuery()
             ->getResult(Query::HYDRATE_ARRAY);
 

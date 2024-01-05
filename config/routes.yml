@@ -45,7 +45,7 @@ ds_gprdcookie_cookie_edit:
 
 ds_gprdcookie_cookie_delete:
     path: /dsgprdcookie/cookies/{id}/delete
-    methods: [POST]
+    methods: [GET, POST]
     defaults:
         _controller: 'DarkSide\DsGprdCookie\Controller\Admin\CookieController::deleteAction'
         _legacy_controller: 'AdminDsGprdCookie'

@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace DarkSide\DsGprdCookie\Repository;
 
-use DarkSide\DsGprdCookie\Entity\DsGprdCookieField;
 use DarkSide\DsGprdCookie\Entity\DsGprdCookieFieldLang;
+use DarkSide\DsGprdCookie\Entity\DsGprdCookieField;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
@@ -28,9 +28,8 @@ class CookieFieldLangRepository extends EntityRepository
      */
     public function findFieldLangByIdLang(int $lang_id): array
     {
-        $fields = $this->createQueryBuilder('f')
-            ->select('cfl.field_name', 'cfl.text_value')
-            ->from(DsGprdCookieFieldLang::class, 'cfl')
+        $fields = $this->createQueryBuilder('cfl')
+            ->select('cf.field_name', 'cfl.text_value')
             ->leftJoin(DsGprdCookieField::class, 'cf', Join::WITH, 'cfl.field = cf.id')
             ->andWhere('cfl.id_lang = :id_lang')
             ->setParameter(':id_lang', $lang_id)
