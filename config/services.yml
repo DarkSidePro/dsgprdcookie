@@ -139,12 +139,3 @@ services:
         class: DarkSide\DsGprdCookie\Controller\Admin\CookieController
         tags:
             - { name: 'controller.service_arguments' }
-
-    darkside.module.dsgprd.command.cookie_build_command:
-        class: 'DarkSide\DsGprdCookie\Command\CookieBuildCommand'
-        arguments: 
-            - '@http_client'
-            - '@request_stack'
-            - '@router'
-        tags:
-            - { name: 'console.command' }
